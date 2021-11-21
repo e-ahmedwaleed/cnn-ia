@@ -1,4 +1,2 @@
-.*
-*.sh
-example.*
-!.gitignore
+*
+!*.*py*
