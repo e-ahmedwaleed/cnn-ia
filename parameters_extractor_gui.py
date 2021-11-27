@@ -12,8 +12,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 # noinspection PyAttributeOutsideInit,SpellCheckingInspection
-class ParametersExtractor(object):
-    def setup_ui(self, main_window):
+class ParametersExtractorGUI(object):
+    def __init__(self, main_window):
         main_window.setObjectName("ParametersExtractor")
         main_window.resize(640, 160)
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -63,12 +63,21 @@ class ParametersExtractor(object):
 
     def set_text(self, main_window):
         _translate = QtCore.QCoreApplication.translate
-        main_window.setWindowTitle(_translate("ParametersExtractor", "Parameters Extractor"))
-        self.modelLocationGB.setTitle(_translate("ParametersExtractor", "Model Location"))
-        self.browseButton.setText(_translate("ParametersExtractor", "..."))
-        self.traningLibraryGB.setTitle(_translate("ParametersExtractor", "Training Library"))
-        self.traningLibrary.setItemText(0, _translate("ParametersExtractor", "TensorFlow"))
-        self.traningLibrary.setItemText(1, _translate("ParametersExtractor", "PyTorch"))
-        self.extractButton.setText(_translate("ParametersExtractor", "Extract Parameters"))
-        self.generateButton.setText(_translate("ParametersExtractor", "Generate A Model"))
-        self.statusbar.setStatusTip(_translate("ParametersExtractor", "I\'m exponentially fine..."))
+        main_window.setWindowTitle("Parameters Extractor")
+        self.modelLocationGB.setTitle("Model Location")
+        self.browseButton.setText("...")
+        self.traningLibraryGB.setTitle("Training Library")
+        self.traningLibrary.setItemText(0, "TensorFlow")
+        self.traningLibrary.setItemText(1, "PyTorch")
+        self.extractButton.setText("Extract Parameters")
+        self.generateButton.setText("Generate A Model")
+
+    def attach_functionality(self, p_e):
+        self.browse_model_location = p_e.browse_model_location
+        self.browseButton.clicked.connect(self.browse_model_location)
+        self.training_library_changed = p_e.training_library_changed
+        self.traningLibrary.currentIndexChanged.connect(self.training_library_changed)
+        self.generate_model = p_e.generate_model
+        self.generateButton.clicked.connect(self.generate_model)
+        self.extract_model_parameters = p_e.extract_model_parameters
+        self.extractButton.clicked.connect(self.extract_model_parameters)
