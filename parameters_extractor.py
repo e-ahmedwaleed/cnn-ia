@@ -1,3 +1,5 @@
+from PyQt5.QtWidgets import QFileDialog
+
 from parameters_extractor_gui import ParametersExtractorGUI
 
 
@@ -10,13 +12,9 @@ class ParametersExtractor(object):
 
     def browse_model_location(self):
         self.set_status("Opening an open file browser window.")
-        # REPLACE THE RANDOM GENERATION CODE BELOW:
-        # https://www.javatpoint.com/python-program-to-generate-a-random-string
-        import random
-        import string
-        location = ''.join((random.choice(string.ascii_lowercase) for x in range(10)))
-        # ENOUGH
-        self.modelLocation.setText("D:\\" + location)
+        file_selected = QFileDialog.getOpenFileName(None, 'Open file')[0]
+        self.modelLocation.setText(file_selected)
+        self.set_status("File selected.")
 
     def training_library_changed(self):
         self.set_status("Training library was changed to " + self.trainingLibrary.currentText() + ".")
