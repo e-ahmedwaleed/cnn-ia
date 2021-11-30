@@ -1,3 +1,6 @@
+import os
+
+from PyQt5.QtWidgets import QFileDialog
 from parameters_extractor_gui import ParametersExtractorGUI
 
 
@@ -7,22 +10,28 @@ class ParametersExtractor(object):
         self.trainingLibrary = gui.traningLibrary
         self.modelLocation = gui.modelLocation
         self.statusbar = gui.statusbar
+        self.default_location = os.path.dirname(os.path.abspath("main.py")).replace("\\", "/")
+        self.modelLocation.setText(self.default_location)
+        self.file_selected = self.default_location
 
     def browse_model_location(self):
-        self.set_status("Opening an open file browser window.")
-        # REPLACE THE RANDOM GENERATION CODE BELOW:
-        # https://www.javatpoint.com/python-program-to-generate-a-random-string
-        import random
-        import string
-        location = ''.join((random.choice(string.ascii_lowercase) for x in range(10)))
-        # ENOUGH
-        self.modelLocation.setText("D:\\" + location)
+        if self.trainingLibrary.currentText() == "TensorFlow":
+            self.file_selected = QFileDialog.getExistingDirectory(None, 'Choose model folder')
+        else:
+            self.file_selected = QFileDialog.getOpenFileName(None, 'Choose model file')[0]
+        self.modelLocation.setText(self.file_selected)
 
     def training_library_changed(self):
+        self.modelLocation.setText(self.default_location)
         self.set_status("Training library was changed to " + self.trainingLibrary.currentText() + ".")
 
     def generate_model(self):
-        self.set_status("Generating a " + self.trainingLibrary.currentText() + " model at current directory.")
+        import generate_model
+        self.file_selected = generate_model.generate(epochs=1,
+                                                     path=self.default_location,
+                                                     library=self.trainingLibrary.currentText())
+        self.modelLocation.setText(self.file_selected)
+        self.set_status("Model Generated Successfully .")
 
     def extract_model_parameters(self):
         self.set_status("Extracting parameters of the model (TO-BE-IMPLEMENTED-LATER)")
