@@ -27,7 +27,9 @@ class ParametersExtractor(object):
 
     def generate_model(self):
         import generate_model
-        self.file_selected = generate_model.generate(self.file_selected, self.trainingLibrary.currentText())
+        self.file_selected = generate_model.generate(epochs=1,
+                                                     path=self.default_location,
+                                                     library=self.trainingLibrary.currentText())
         self.modelLocation.setText(self.file_selected)
         self.set_status("Model Generated Successfully .")
 

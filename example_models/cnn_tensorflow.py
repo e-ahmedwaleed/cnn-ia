@@ -7,8 +7,9 @@ class TensorflowImplementation(object):
     def __init__(self):
         self.model = models.Sequential()
 
-    def generate_model(self):
+    def generate_model(self, epochs):
         """ Load and prepare the dataset """
+
         (train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data(path='mnist.npz')
         # Normalize pixel values to be between 0 and 1
         train_images, test_images = train_images / 255.0, test_images / 255.0
@@ -34,12 +35,12 @@ class TensorflowImplementation(object):
         # compiling the model
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-        """Train the model for 10 epochs."""
+        """ Train the model """
 
         # training the model
-        self.model.fit(train_images, train_labels, epochs=10, validation_data=(test_images, test_labels))
+        self.model.fit(train_images, train_labels, epochs=epochs, validation_data=(test_images, test_labels))
 
     def save_model(self, path):
-        path = path + "\\CNN-TensorFlow-mnist"
+        path = path + "/CNN-TensorFlow-mnist"
         self.model.save(path)
         return path

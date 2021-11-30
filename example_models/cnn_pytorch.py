@@ -40,8 +40,9 @@ class PyTorchImplementation(object):
     def __init__(self):
         self.model = Net()
 
-    def generate_model(self):
-        """Step 2: Load and prepare the dataset"""
+    def generate_model(self, epochs):
+        """ Load and prepare the dataset """
+
         # transformations to be applied on images
         transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,)), ])
 
@@ -62,9 +63,9 @@ class PyTorchImplementation(object):
             self.model = self.model.cuda()
             criterion = criterion.cuda()
 
-        """ train this model for 10 epochs"""
+        """ Train the model """
 
-        for i in range(10):
+        for i in range(epochs):
             running_loss = 0
             for images, labels in train_loader:
 
@@ -89,6 +90,6 @@ class PyTorchImplementation(object):
                 print("Epoch {} - Training loss: {}".format(i + 1, running_loss / len(train_loader)))
 
     def save_model(self, path):
-        path = path + "\\CNN-PyTorch-mnist"
+        path = path + "/CNN-PyTorch-mnist"
         torch.save(self.model.state_dict(), path)
         return path
