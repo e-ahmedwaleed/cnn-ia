@@ -5,7 +5,7 @@ file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
 from PyQt5 import QtWidgets
-from parameters_extractor import ParametersExtractor, ParametersExtractorGUI
+from gui.parameters_extractor import ParametersExtractor, ParametersExtractorGUI
 
 app = QtWidgets.QApplication(sys.argv)
 window = QtWidgets.QMainWindow()

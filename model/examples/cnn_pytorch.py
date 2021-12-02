@@ -4,8 +4,6 @@ from torch import nn, optim
 from torchvision import datasets, transforms
 
 
-# defining the model
-
 # noinspection PyTypeChecker
 class Net(nn.Module):
     def __init__(self):
