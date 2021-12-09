@@ -1,3 +1,7 @@
+import tensorflow as tf
+
+tf.get_logger().setLevel('ERROR')
+
 from tensorflow.keras import datasets, layers, models
 from tensorflow.keras.utils import to_categorical
 
@@ -42,5 +46,10 @@ class TensorflowImplementation(object):
 
     def save_model(self, path):
         path = path + "/CNN-TensorFlow-mnist"
+        import os
+        try:
+            os.mkdir(path)
+        except OSError:
+            pass
         self.model.save(path)
         return path

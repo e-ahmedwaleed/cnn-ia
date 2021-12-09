@@ -89,5 +89,5 @@ class PyTorchImplementation(object):
 
     def save_model(self, path):
         path = path + "/CNN-PyTorch-mnist"
-        torch.save(self.model.state_dict(), path)
+        torch.save(self.model, path)
         return path
