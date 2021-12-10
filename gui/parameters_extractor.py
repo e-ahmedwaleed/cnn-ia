@@ -44,9 +44,12 @@ class ParametersExtractor(object):
         from model import generate_model
         self.selected_path = generate_model.generate(path=self.default_path,
                                                      library=self.modelLibrary.currentText(), epochs=1)
-        self.modelLibrary.setCurrentIndex(0)
-        self.modelLocation.setText(self.selected_path)
-        self.set_status("Model Generated Successfully.")
+        if self.selected_path != self.default_path:
+            self.modelLibrary.setCurrentIndex(0)
+            self.modelLocation.setText(self.selected_path)
+            self.set_status("Model Generated Successfully.")
+        else:
+            self.set_status("Model Generation Failed!")
 
     def extract_model_parameters(self):
         from model import extract_model

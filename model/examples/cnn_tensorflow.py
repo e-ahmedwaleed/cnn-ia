@@ -46,10 +46,25 @@ class TensorflowImplementation(object):
 
     def save_model(self, path):
         path = path + "/CNN-TensorFlow-mnist"
+
         import os
         try:
             os.mkdir(path)
         except OSError:
             pass
         self.model.save(path)
-        return path
+
+        import subprocess
+        proc = subprocess.run(
+            'python -m tf2onnx.convert --saved-model CNN-TensorFlow-mnist --output CNN-TensorFlow-mnist.onnx'.split(),
+            capture_output=True)
+        print(proc.stdout.decode('ascii'))
+        print(proc.stderr.decode('ascii'))
+
+        import shutil
+        try:
+            shutil.rmtree(path)
+        except OSError:
+            pass
+
+        return path + '.onnx' if proc.returncode == 0 else None
