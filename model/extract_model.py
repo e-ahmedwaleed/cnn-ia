@@ -1,14 +1,15 @@
-def extract(path, library):
-    if library == "TensorFlow":
-        from tensorflow.keras.models import load_model
-        model = load_model(path)
+import onnx
 
-        print(model.summary())
-    else:
-        from torch import load
-        model = load(path)
-        model.eval()
 
-        print(model)
+def extract(path):
+    model = onnx.load(path)
+    onnx.checker.check_model(model)
+    from onnx import numpy_helper
+    initializers = model.graph.initializer
+
+    onnx_weights = {}
+    for initializer in initializers:
+        w = numpy_helper.to_array(initializer)
+        onnx_weights[initializer.name] = w
 
     return "Model Extracted Successfully."
