@@ -50,10 +50,6 @@ class Graph:
 
         return metadata
 
-    def visualize(self):
-        import netron
-        netron.start(self.path)
-
     @staticmethod
     def identify_dim(var):
         dims = [[d.dim_value for d in _var.type.tensor_type.shape.dim] for _var in var][0]
