@@ -2,6 +2,7 @@ import tensorflow as tf
 
 tf.get_logger().setLevel('ERROR')
 
+from gui import utils
 from tensorflow.keras import datasets, layers, models
 from tensorflow.keras.utils import to_categorical
 
@@ -47,24 +48,11 @@ class TensorflowImplementation(object):
     def save_model(self, path):
         path = path + "/CNN-TensorFlow-mnist"
 
-        import os
-        try:
-            os.mkdir(path)
-        except OSError:
-            pass
+        utils.create_folder(path)
         self.model.save(path)
 
-        import subprocess
-        proc = subprocess.run(
-            'python -m tf2onnx.convert --saved-model CNN-TensorFlow-mnist --output CNN-TensorFlow-mnist.onnx'.split(),
-            capture_output=True)
-        print(proc.stdout.decode('ascii'))
-        print(proc.stderr.decode('ascii'))
-
-        import shutil
-        try:
-            shutil.rmtree(path)
-        except OSError:
-            pass
+        proc = utils.run_command(
+            'python -m tf2onnx.convert --saved-model CNN-TensorFlow-mnist --output CNN-TensorFlow-mnist.onnx')
+        utils.delete_folder(path)
 
         return path + '.onnx' if proc.returncode == 0 else None

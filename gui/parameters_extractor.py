@@ -2,7 +2,7 @@ import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-from PyQt5.QtWidgets import QFileDialog
+from gui import utils
 from gui.parameters_extractor_gui import ParametersExtractorGUI
 
 
@@ -20,20 +20,18 @@ class ParametersExtractor(object):
 
         self.statusbar = gui.statusbar
 
-        self.default_path = os.path.dirname(os.path.abspath("main.py")).replace("\\",
-                                                                                "/")  # + "/CNN-TensorFlow-cifar10"
-        self.modelLocation.setText(self.default_path)
-        self.selected_path = self.default_path
+        self.modelLocation.setText(utils.main_dir_path)
+        self.selected_path = utils.main_dir_path
 
     def browse_model_location(self):
-        selected_path = QFileDialog.getOpenFileName(None, 'Choose model file', self.default_path, "Model (*.onnx)")[0]
+        selected_path = utils.choose_file_dialog('Choose model file', "Model (*.onnx)")
 
         if selected_path:
             self.selected_path = selected_path
             self.modelLocation.setText(self.selected_path)
 
     def model_library_changed(self):
-        self.modelLocation.setText(self.default_path)
+        self.modelLocation.setText(utils.main_dir_path)
         self.set_status("Model library was changed to " + self.modelLibrary.currentText() + ".")
         if self.modelLibrary.currentText() == "ONNX":
             self.debug_mode(False)
@@ -42,9 +40,9 @@ class ParametersExtractor(object):
 
     def generate_model(self):
         from model import generate_model
-        self.selected_path = generate_model.generate(path=self.default_path,
+        self.selected_path = generate_model.generate(path=utils.main_dir_path,
                                                      library=self.modelLibrary.currentText(), epochs=1)
-        if self.selected_path != self.default_path:
+        if self.selected_path != utils.main_dir_path:
             self.modelLibrary.setCurrentIndex(0)
             self.modelLocation.setText(self.selected_path)
             self.set_status("Model Generated Successfully.")
