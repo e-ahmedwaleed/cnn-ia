@@ -91,27 +91,31 @@ class Node(Property):
             if unmatched & ("MODEL_OUTPUT" not in node):
                 print("Unmatched output!?")
 
-    def __str__(self):
-        s = super().__str__() + ":\n"
+    def save(self, path):
+        summary = super().__str__() + ":\n"
 
         if len(self.attributes):
-            s += '\t' + "Attributes:" + '\n'
+            summary += '\t' + "Attributes:" + '\n'
             for attribute in self.attributes:
-                s += "\t\t" + str(attribute) + '\n'
+                summary += "\t\t" + str(attribute) + '\n'
 
         if len(self.inputs):
-            s += '\t' + "Inputs:" + '\n'
+            summary += '\t' + "Inputs:" + '\n'
             for node in self.inputs:
-                s += "\t\t" + str(node) + '\n'
+                summary += "\t\t" + str(node) + (".node" if "(" not in str(node) else "") + '\n'
 
         if len(self.parameters):
-            s += '\t' + "Parameters:" + '\n'
-            for parameter in self.parameters:
-                s += "\t\t" + str(parameter.dtype) + ": " + str(parameter.shape) + '\n'
+            summary += '\t' + "Parameters:" + '\n'
+            for i, parameter in enumerate(self.parameters):
+                np_arr_name = self.name + "_" + str(i)
+                # TODO: print("Saving np array: " + np_arr_name)
+                summary += "\t\t" + np_arr_name + " '" + str(parameter.dtype) + "': " + str(parameter.shape) + '\n'
 
         if len(self.outputs):
-            s += '\t' + "Outputs:" + '\n'
+            summary += '\t' + "Outputs:" + '\n'
             for node in self.outputs:
-                s += "\t\t" + str(node) + '\n'
+                summary += "\t\t" + str(node) + (".node" if "(" not in str(node) else "") + '\n'
 
-        return s
+        file = open(path + '/' + self.name + ".node", "w")
+        file.write(summary)
+        file.close()

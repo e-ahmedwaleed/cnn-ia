@@ -34,8 +34,15 @@ class Graph:
             self.onnx_nodes[i].identify_node_outputs(onnx_nodes_inputs)
             self.onnx_nodes[i].identify_node_parameters(onnx_initializers)
 
-        output_location = utils.choose_folder_dialog('Choose output folder') + "/output"
-        utils.create_folder(output_location)
+    def save(self):
+        dir_path = utils.choose_folder_dialog('Choose output folder') + "/output"
+        utils.delete_folder(dir_path)
+        utils.create_folder(dir_path)
+
+        for i in self.onnx_nodes:
+            self.onnx_nodes[i].save(dir_path)
+
+        return dir_path + '/' + self.onnx_nodes[0].name + ".node"
 
     def visualize(self):
         import netron
