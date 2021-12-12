@@ -38,7 +38,7 @@ class PyTorchImplementation(object):
     def __init__(self):
         self.model = Net()
 
-    def generate_model(self, epochs):
+    def generate_model(self, path, epochs):
         """ Load and prepare the dataset """
 
         # transformations to be applied on images
@@ -87,7 +87,7 @@ class PyTorchImplementation(object):
             else:
                 print("Epoch {} - Training loss: {}".format(i + 1, running_loss / len(train_loader)))
 
-    def save_model(self, path):
-        path = path + "/CNN-PyTorch-mnist"
-        torch.save(self.model, path)
+        path = path + "/CNN-PyTorch-mnist.onnx"
+        # noinspection PyUnboundLocalVariable
+        torch.onnx.export(self.model, images[0].view(1, 1, 28, 28), path)
         return path
