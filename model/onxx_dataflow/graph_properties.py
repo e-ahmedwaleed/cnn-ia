@@ -1,19 +1,7 @@
 import re
 
-
-class Property:
-    def __init__(self, name, property_type):
-        self.name = self.valid_property_name(name)
-        self.type = property_type
-
-    def __str__(self):
-        return str(self.name) + " '" + str(self.type) + "'"
-
-    @staticmethod
-    # A file name can't contain any of the following characters: \/:*?"<>|
-    def valid_property_name(name):
-        return re.sub('[\\\\/:*?\\"<>|]', '_', str(name))
-
+from gui import utils
+from onnx.helper import get_attribute_value
 
 AttributeType = {
     0: "UNDEFINED",
@@ -34,7 +22,19 @@ AttributeType = {
     14: "TYPE_PROTOS"
 }
 
-from onnx.helper import get_attribute_value
+
+class Property:
+    def __init__(self, name, property_type):
+        self.name = self.valid_property_name(name)
+        self.type = property_type
+
+    def __str__(self):
+        return str(self.name) + " '" + str(self.type) + "'"
+
+    @staticmethod
+    # A file name can't contain any of the following characters: \/:*?"<>|
+    def valid_property_name(name):
+        return re.sub('[\\\\/:*?\\"<>|]', '_', str(name))
 
 
 class Attribute(Property):
@@ -107,15 +107,19 @@ class Node(Property):
         if len(self.parameters):
             summary += '\t' + "Parameters:" + '\n'
             for i, parameter in enumerate(self.parameters):
-                np_arr_name = self.name + "_" + str(i)
-                # TODO: print("Saving np array: " + np_arr_name)
-                summary += "\t\t" + np_arr_name + " '" + str(parameter.dtype) + "': " + str(parameter.shape) + '\n'
+                param_file = self.save_parameter(path, self.name + "_" + str(i), parameter)
+                summary += "\t\t" + param_file + ".param '" + str(parameter.dtype) + "': " + str(parameter.shape) + '\n'
 
         if len(self.outputs):
             summary += '\t' + "Outputs:" + '\n'
             for node in self.outputs:
                 summary += "\t\t" + str(node) + (".node" if "(" not in str(node) else "") + '\n'
 
-        file = open(path + '/' + self.name + ".node", "w")
-        file.write(summary)
-        file.close()
+        utils.create_file(path + '/' + self.name + ".node", summary)
+
+    @staticmethod
+    def save_parameter(path, file_name, parameter):
+        import numpy as np
+        np.set_printoptions(threshold=np.inf)
+        utils.create_file(path + '/' + file_name + ".param", str(parameter))
+        return file_name

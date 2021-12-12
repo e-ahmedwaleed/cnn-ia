@@ -16,6 +16,12 @@ def run_command(_cmd):
     return proc
 
 
+def create_file(_path, _content):
+    file = open(_path, "w")
+    file.write(_content)
+    file.close()
+
+
 def create_folder(_path):
     import os
     try:
