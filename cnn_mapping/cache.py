@@ -1,5 +1,6 @@
 from collections import deque
 
+
 class Cache(object):
     '''
     Helper class for cache computed values to reduce runtime
@@ -18,19 +19,16 @@ class Cache(object):
         if len(self.cache_map[level]) == 0 or data not in self.cache_map[level]:
             return None
         else:
-            return self.cache_map[level][data]    
+            return self.cache_map[level][data]
 
     def write_cache(self, level, data, value):
         '''
         Only write cache, change map and queue
-        ''' 
+        '''
         assert len(self.cache_map[level]) == len(self.cache_queue[level])
         self.cache_map[level][data] = value
         self.cache_queue[level].append(data)
 
         if len(self.cache_queue[level]) > self.size:
             pop_ele = self.cache_queue[level].popleft()
-            del self.cache_map[level][pop_ele] 
-
-
-       
+            del self.cache_map[level][pop_ele]

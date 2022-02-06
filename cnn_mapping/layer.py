@@ -2,6 +2,7 @@
 Layer specification.
 '''
 
+
 class Layer(object):
     '''
     NN layer parameters.
@@ -38,11 +39,12 @@ class Layer(object):
 
     @classmethod
     def layer(cls, info):
-        return cls(info["input_fmap_channel"], info["output_fmap_channel"], 
-                     info["fmap_width"], info["fmap_height"], info["window_width"],
-                     info["window_height"], info["batch_size"], 
-                     info["stride_width"], info["stride_height"]) 
-    
+        return cls(info["input_fmap_channel"], info["output_fmap_channel"],
+                   info["fmap_width"], info["fmap_height"], info["window_width"],
+                   info["window_height"], info["batch_size"],
+                   info["stride_width"], info["stride_height"])
+
+
 class FCLayer(Layer):
     '''
     NN fully-connected layer parameters.
@@ -52,4 +54,3 @@ class FCLayer(Layer):
 
     def __init__(self, nifm, nofm, wfil, hfil, nimg=1):
         Layer.__init__(self, nifm, nofm, 1, 1, wfil, hfil, nimg)
-

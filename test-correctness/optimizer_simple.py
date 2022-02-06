@@ -2,11 +2,11 @@
 Simple test case for checking get_cost
 '''
 import unittest
-import cnn_mapping as cm 
+import cnn_mapping as cm
+
 
 class TestOptimizer(unittest.TestCase):
-
-    '''    
+    '''
     def test_simple(self):
         capacity_list = [512, 262144] #[512, 16384, 262144, 2097152]
         access_cost_list = [1, 23] #[1, 6, 23, 64]
@@ -96,8 +96,9 @@ class TestOptimizer(unittest.TestCase):
         cm.utils.print_loop_nest(opt_result[1])
    
     '''
+
     def test_alex_conv3(self):
-        capacity_list = [512/2, 131072/2, 2097152*256]
+        capacity_list = [512 / 2, 131072 / 2, 2097152 * 256]
         access_cost_list = [1, 6, 200]
         static_cost_list = [0, 0, 0]
         para_count_list = [256, 1, 1]
@@ -109,9 +110,10 @@ class TestOptimizer(unittest.TestCase):
         level1 = cm.cost_model.get_level_cost(resource, opt_result[1], layer, 1)
         level2 = cm.cost_model.get_level_cost(resource, opt_result[1], layer, 2)
         level00 = cm.cost_model.get_array_and_curr_level_cost(resource, opt_result[1], layer, 1) - level1
-        print level0, level00, level1, level2
+        print
+        level0, level00, level1, level2
         cm.utils.print_loop_nest(opt_result[1])
-    
+
 
 if __name__ == '__main__':
     unittest.main()
