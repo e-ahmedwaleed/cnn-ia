@@ -594,20 +594,16 @@ def blocking_partitioning_generator_function(resource, layer, schedule, verbose=
             if cost_model.valid_partitioning(resource, dummy_mapping_point, layer, verbose):
                 #                if cost_model.valid_mapping_point(resource, dummy_mapping_point, layer, verbose):
                 if verbose == 3:
-                    print()
-                    "Valid"
-                    print()
-                    ""
+                    print("Valid")
+                    print("")
                 yield [blocking_list, partitioning_list, para_dim]
             #                else:
             #                   print "invalid"
             #                    print ""
             else:
                 if verbose == 3:
-                    print()
-                    "invalid"
-                    print()
-                    ""
+                    print("invalid")
+                    print("")
 
 
 def opt_get_best_loop_order(resource, layer, point, verbose=False):

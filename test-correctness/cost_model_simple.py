@@ -20,7 +20,7 @@ class TestCostModel(unittest.TestCase):
         point = cm.MappingPoint(loop_order_list, loop_blockings_list, loop_partitionings_list)
         resource = cm.Resource(capacity_list, access_cost_list, static_cost_list, para_count_list)
         layer = cm.Layer(64, 32, 8, 8, 3, 3, 1)
-        cost_total = cm.cost_model.get_cost(resource, point, layer, True)
+        cost_total = cm.cost_model.get_cost(resource, point, layer, True)[0]
         cost_levels = cm.cost_model.get_level_cost(resource, point, layer, 0, True) + \
                       cm.cost_model.get_level_cost(resource, point, layer, 1, True)
         self.assertEqual(cost_total, cost_levels)
@@ -38,7 +38,7 @@ class TestCostModel(unittest.TestCase):
         point = cm.MappingPoint(loop_order_list, loop_blockings_list, loop_partitionings_list)
         resource = cm.Resource(capacity_list, access_cost_list, static_cost_list, para_count_list)
         layer = cm.Layer(64, 32, 8, 8, 3, 3, 1)
-        cost_total = cm.cost_model.get_cost(resource, point, layer, True)
+        cost_total = cm.cost_model.get_cost(resource, point, layer, True)[0]
         cost_blocks = cm.cost_model.get_block_cost(resource, point, layer, True)
         for _cost_blocks in sum(cost_blocks):
             self.assertEqual(cost_total, _cost_blocks)
@@ -97,7 +97,7 @@ class TestCostModel(unittest.TestCase):
         point = cm.MappingPoint(loop_order_list, loop_blockings_list, loop_partitionings_list)
         resource = cm.Resource(capacity_list, access_cost_list, static_cost_list, para_count_list)
         layer = cm.Layer(64, 32, 8, 8, 3, 3, 1)
-        cost = cm.cost_model.get_cost(resource, point, layer, True)
+        cost = cm.cost_model.get_cost(resource, point, layer, True)[0]
         valid = cm.cost_model.valid_mapping_point(resource, point, layer)
         self.assertEqual(valid, False)
 

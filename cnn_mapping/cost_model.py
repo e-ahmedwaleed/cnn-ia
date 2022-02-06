@@ -996,8 +996,6 @@ def get_cost(resource, point, layer, verbose=False):
         print('block_size_list: ', block_size_list)
         print('layer_size: ', layer_size)
         print('total cost: ', total_cost)
-        # TODO: DELETE
-        return total_cost
 
     # return total_cost
     return total_cost, total_access_cost, access_list, layer_size
