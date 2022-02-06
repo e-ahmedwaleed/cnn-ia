@@ -1,11 +1,9 @@
 '''
 Top level function of optimization framework
 '''
-import cnn_mapping.mapping_point_generator
-import cnn_mapping.cost_model
 
-import cnn_mapping.loop_enum as le
-import cnn_mapping.buffer_enum as be
+from cnn_mapping import cost_model
+from cnn_mapping import mapping_point_generator
 
 
 def opt_optimizer(resource, layer, hint=None, verbose=False):

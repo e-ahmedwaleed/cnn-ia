@@ -85,7 +85,7 @@ class Resource(object):
         assert len(buf_capacity_list) == len(buf_unit_static_cost_list)
         assert len(buf_capacity_list) == len(para_count_list)
 
-        self.bufs = [Buffer(*t) for t in zip(buf_capacity_list, \
+        self.bufs = [Buffer(*t) for t in zip(buf_capacity_list,
                                              buf_access_cost_list, buf_unit_static_cost_list)]
 
         self.num_levels = len(self.bufs)
@@ -99,8 +99,9 @@ class Resource(object):
             for i in range(self.num_levels):
                 # when using non-default partition mode, the parallelism
                 # count needs to be large than 1
-                assert partition_mode[i] == 0 or para_count_list <= 1 \
-                       or (partition_mode[i] > 0 and para_count_list > 1)
+		# TODO: DELETE para_count_list[i] -> para_count_list
+                assert partition_mode[i] == 0 or para_count_list[i] <= 1 \
+                       or (partition_mode[i] > 0 and para_count_list[i] > 1)
                 if partition_mode[i] == 1 or partition_mode[i] == 2:
                     array_access_costs[i] = array_access_cost[array_level]
                     array_level += 1
@@ -117,7 +118,7 @@ class Resource(object):
         array_width = [para_count_list[i] if array_dim[i] == 1 else int(math.sqrt(para_count_list[i])) for i in
                        range(self.num_levels)]
 
-        self.paras = [Parallelism(*t) for t in zip(para_count_list, \
+        self.paras = [Parallelism(*t) for t in zip(para_count_list,
                                                    partition_mode, array_access_costs, array_dim, array_width)]
         self.access_cost = buf_access_cost_list
         # If list does not contain 3 separate access costs for (inputs, weights, psum)

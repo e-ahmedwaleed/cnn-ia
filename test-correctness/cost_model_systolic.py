@@ -24,7 +24,7 @@ class TestCostModel(unittest.TestCase):
         cm.utils.print_loop_nest(point)
         cost = cm.cost_model.get_cost(resource, point, layer, True)
         real_cost = (6400 * 288 + 2048 * 1151 + 18432 * 64) + (6400 * 96 + 2048 * 24 + 18432 * 4) * 2 + (
-                    6400 * 32 + 2048 * 15 + 18432 * 1) * 64
+                6400 * 32 + 2048 * 15 + 18432 * 1) * 64
         self.assertEqual(cost, real_cost)
 
     '''
@@ -66,7 +66,7 @@ class TestCostModel(unittest.TestCase):
         cm.utils.print_loop_nest(point)
         cost = cm.cost_model.get_cost(resource, point, layer, True)
         real_cost = (6400 * 288 + 2048 * 1151 + 18432 * 64) + (6400 * 96 + 2048 * 24 + 18432 * 1) * 2 + (
-                    4 * 18432) * 6 + (6400 * 32 + 2048 * 15 + 18432 * 1) * 64
+                4 * 18432) * 6 + (6400 * 32 + 2048 * 15 + 18432 * 1) * 64
         self.assertEqual(cost, real_cost)
         cost_levels = cm.cost_model.get_level_cost(resource, point, layer, 0, True) + \
                       cm.cost_model.get_array_and_curr_level_cost(resource, point, layer, 1, True)
@@ -89,7 +89,7 @@ class TestCostModel(unittest.TestCase):
         cm.utils.print_loop_nest(point)
         cost = cm.cost_model.get_cost(resource, point, layer, True)
         real_cost = (12800 * 288 + 2048 * 2303 + 36864 * 64) + (12800 * 96 + 2048 * 384 + 36864 * 1) * 2 + (
-                    36864 * 4) * 6 + (12800 * 32 + 2048 * 15 + 36864 * 1) * 64
+                36864 * 4) * 6 + (12800 * 32 + 2048 * 15 + 36864 * 1) * 64
         self.assertEqual(cost, real_cost)
         cost_levels = cm.cost_model.get_level_cost(resource, point, layer, 0, True) + \
                       cm.cost_model.get_array_and_curr_level_cost(resource, point, layer, 1, True)
@@ -112,7 +112,7 @@ class TestCostModel(unittest.TestCase):
         cm.utils.print_loop_nest(point)
         cost = cm.cost_model.get_cost(resource, point, layer, True)
         real_cost = (25600 * 288 + 8192 * 1151 + 18432 * 256) + (25600 * 96 + 8192 * 96 + 18432 * 1) * 2 + (
-                    18432 * 4) * 6 + (18432 * 4) * 8 + (25600 * 32 + 8192 * 15 + 18432 * 1) * 64
+                18432 * 4) * 6 + (18432 * 4) * 8 + (25600 * 32 + 8192 * 15 + 18432 * 1) * 64
         # self.assertEqual(cost, real_cost)
         cost_levels = cm.cost_model.get_level_cost(resource, point, layer, 0, True) + \
                       cm.cost_model.get_array_and_curr_level_cost(resource, point, layer, 1, True)

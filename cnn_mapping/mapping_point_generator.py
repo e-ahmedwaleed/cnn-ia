@@ -9,16 +9,15 @@ parallelism to be factors of the layer size
 import itertools
 import copy
 from operator import mul
-import math
 import pickle
 
 from cnn_mapping.mapping_point import MappingPoint
 from cnn_mapping.cache import Cache
-import cnn_mapping.cost_model
 
+from cnn_mapping import utils
+from cnn_mapping import cost_model
 import cnn_mapping.loop_enum as le
-import cnn_mapping.buffer_enum as be
-import cnn_mapping.utils
+
 from functools import reduce
 
 
@@ -426,12 +425,12 @@ def current_level_partition_blocking_2d_with_hint(loop_tiles, slb, para_count, l
     para_dim_permutation = []
 
     para_perm_1d0, para_index_perm_1d0 = current_level_partition_blocking_1d_with_hint(loop_tiles, slb, para_count,
-                                                                                       layer, \
+                                                                                       layer,
                                                                                        level,
                                                                                        schedule.hint_para_index[level][
                                                                                            0], schedule, u_threshold)
     para_perm_1d1, para_index_perm_1d1 = current_level_partition_blocking_1d_with_hint(loop_tiles, slb, para_count,
-                                                                                       layer, \
+                                                                                       layer,
                                                                                        level,
                                                                                        schedule.hint_para_index[level][
                                                                                            1], schedule, u_threshold)
@@ -453,7 +452,7 @@ def current_level_partition_blocking_2d(loop_tiles, slb, para_count, layer, u_th
     para_permutation = []
     para_dim_permutation = []
 
-    para_perm_1d, para_index_perm_1d = current_level_partition_blocking_1d(loop_tiles, slb, para_count, \
+    para_perm_1d, para_index_perm_1d = current_level_partition_blocking_1d(loop_tiles, slb, para_count,
                                                                            layer, u_threshold, replication)
     para_index_generator = para_index_generator_function(para_index_perm_1d)
 
@@ -571,8 +570,7 @@ def blocking_partitioning_generator_function(resource, layer, schedule, verbose=
 
     for loop_blocking in blocking_generator:
         if verbose == 3:
-            print()
-            "loop_tilling: ", loop_blocking
+            print("loop_tilling: ", loop_blocking)
 
         loop_blocking_reshape = list(zip(*loop_blocking))
         pb_generator = parallel_blocking_generator_function(loop_blocking_reshape, resource, layer, schedule)
@@ -588,12 +586,9 @@ def blocking_partitioning_generator_function(resource, layer, schedule, verbose=
             partitioning_list = list(zip(*partition))
 
             if verbose == 3:
-                print()
-                "loop_blocking: ", blocking_list
-                print()
-                "loop_partition: ", partitioning_list
-                print()
-                "para_dimension: ", para_dim
+                print("loop_blocking: ", blocking_list)
+                print("loop_partition: ", partitioning_list)
+                print("para_dimension: ", para_dim)
 
             dummy_mapping_point = MappingPoint(None, blocking_list, partitioning_list, para_dim)
             if cost_model.valid_partitioning(resource, dummy_mapping_point, layer, verbose):
@@ -666,12 +661,10 @@ def opt_get_best_loop_order(resource, layer, point, verbose=False):
                 smallest_cost = curr_cost
 
             if verbose >= 3:
-                print()
-                "Level", level, "Current order:", curr_level_order, "     Best order:", best_curr_level_order
-                print()
-                "Level", level, "Current energy:", '%20d' % curr_cost, "     Best energy:", '%20d' % smallest_cost
-                print()
-                ""
+                print("Level", level, "Current order:", curr_level_order, "     Best order:", best_curr_level_order)
+                print("Level", level, "Current energy:", '%20d' % curr_cost, "     Best energy:",
+                      '%20d' % smallest_cost)
+                print("")
 
             # LMEI later, instead of using mac_capacity, we could use 4-level memory model, treat mac_capacity
             #  as the innermost memory level for output.
@@ -707,8 +700,8 @@ def opt_mapping_point_generator_function(resource, layer, schedule=None, verbose
            an invalid blocking_partitioning 
         '''
         if verbose >= 2:
-            print()
-            "Find best order for schedule: ", blocking_partitioning
+            print("Find best order for schedule: ", blocking_partitioning)
+
         [blocking, partitioning, para_dim] = blocking_partitioning
         dummy_mapping_point = MappingPoint(None, blocking, partitioning, para_dim)
         # print "blocking_partitioning: ", blocking_partitioning
@@ -717,12 +710,10 @@ def opt_mapping_point_generator_function(resource, layer, schedule=None, verbose
             smallest_cost = cost
             best_mapping_point = MappingPoint(loop_order, blocking, partitioning, para_dim)
             if verbose >= 2:
-                print()
-                "best loop order: ", best_mapping_point.loop_orders
-                print()
-                "Update smallest cost: ", smallest_cost
-                print()
-                "Update best schedule: ", utils.print_loop_nest(best_mapping_point)
+                print("best loop order: ", best_mapping_point.loop_orders)
+                print("Update smallest cost: ", smallest_cost)
+                print("Update best schedule: ", utils.print_loop_nest(best_mapping_point))
+
     assert best_mapping_point, "No valid mapping point found."
     return smallest_cost, best_mapping_point
 
@@ -755,8 +746,8 @@ def mapping_point_generator_function(resource, layer, schedule=None, verbose=Fal
             order_generator = \
                 opt_order_generator_function(dummy_mapping_point, le.NUM, num_levels)
             for loop_order in order_generator:
-                mapping_point = MappingPoint(loop_order, \
-                                             blocking, \
+                mapping_point = MappingPoint(loop_order,
+                                             blocking,
                                              partitioning)
                 yield mapping_point
 
@@ -816,8 +807,8 @@ def dataflow_exploration(resource, layer, file_name, verbose=False):
            an invalid blocking_partitioning 
         '''
         if verbose >= 2:
-            print()
-            "Find best order for schedule: ", blocking_partitioning
+            print("Find best order for schedule: ", blocking_partitioning)
+
         [blocking, partitioning, para_dim] = blocking_partitioning
         dummy_mapping_point = MappingPoint(None, blocking, partitioning, para_dim)
         # print "partitioning: ", partitioning
@@ -830,16 +821,13 @@ def dataflow_exploration(resource, layer, file_name, verbose=False):
             best_mapping_point = MappingPoint(loop_order, blocking, partitioning, para_dim)
             dataflow_tb[unrolled_loops] = (cost, utilization, best_mapping_point)  # TODO utilization
             if verbose:
-                print()
-                "unrolled loops: ", unrolled_loops, " with utilization ", utilization
+                print("unrolled loops: ", unrolled_loops, " with utilization ", utilization)
                 # print "best loop order: ", best_mapping_point.loop_orders
-                print()
-                "blocking: ", blocking
-                print()
-                "partitioning: ", partitioning
-                print()
-                "Update smallest cost: ", dataflow_tb[unrolled_loops][0]
+                print("blocking: ", blocking)
+                print("partitioning: ", partitioning)
+                print("Update smallest cost: ", dataflow_tb[unrolled_loops][0])
                 # print "Update best shedule: ", utils.print_loop_nest(best_mapping_point)
+
     # assert best_mapping_point, "No valid mapping point found."
     pickle_file_name = file_name + ".pickle"
     pickle.dump(dataflow_tb, open(pickle_file_name, "wb"))

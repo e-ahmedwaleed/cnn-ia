@@ -1,5 +1,4 @@
 import cnn_mapping.loop_enum as le
-import cnn_mapping.buffer_enum as be
 
 
 def print_loop_nest(point):

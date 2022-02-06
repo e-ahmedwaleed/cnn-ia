@@ -1,14 +1,13 @@
 '''
 Cost model.
 '''
-# import numpy as np
+import numpy as np
 from operator import mul
 from operator import add
 import copy
 import math
 
 import cnn_mapping.loop_enum as le
-import cnn_mapping.buffer_enum as be
 from functools import reduce
 
 
@@ -699,8 +698,8 @@ def valid_partition_number(resource, partitioning, level):
 
 
 def valid_partitioning_current_level(resource, point, layer, level, verbose=False):
-    valid_size = fit_in_level(resource.buffer(level).capacity, \
-                              get_bank_size(point, layer, level), resource.invalid_underutilized, level,
+    valid_size = fit_in_level(resource.buffer(level).capacity, get_bank_size(point, layer, level),
+                              resource.invalid_underutilized, level,
                               resource.memory_partitions)
 
     return valid_size
@@ -828,8 +827,8 @@ def get_array_and_curr_level_cost(resource, point, layer, level, verbose=False):
     layer_size = get_layer_size(layer)
     mac_capacity = resource.mac_capacity
 
-    level_access = [get_if_access(level, point, layer, mac_capacity), \
-                    get_of_access(level, point, layer, mac_capacity), \
+    level_access = [get_if_access(level, point, layer, mac_capacity),
+                    get_of_access(level, point, layer, mac_capacity),
                     get_fl_access(level, point, layer, mac_capacity)]
 
     [if_access, of_access, fl_access] = level_access
@@ -863,8 +862,8 @@ def get_level_cost(resource, point, layer, level, verbose=False):
     layer_size = get_layer_size(layer)
     mac_capacity = resource.mac_capacity
 
-    level_access = [get_if_access(level, point, layer, mac_capacity), \
-                    2 * get_of_access(level, point, layer, mac_capacity) - 1, \
+    level_access = [get_if_access(level, point, layer, mac_capacity),
+                    2 * get_of_access(level, point, layer, mac_capacity) - 1,
                     get_fl_access(level, point, layer, mac_capacity)]
 
     buffer_access = list(map(mul, level_access, layer_size))
@@ -943,7 +942,7 @@ def get_block_cost(resource, point, layer, verbose=False):
     block_costs = [0.0, 0.0, 0.0]
     for i in range(len(total_access_cost)):
         buffer_access = [a * b for a, b in zip(access_list[i], layer_size)]
-        block_cost = [x * total_access_cost[i] for x in buffer_access]
+        block_cost = [x * np.array(total_access_cost[i]) for x in buffer_access]
         block_costs = list(map(add, block_cost, block_costs))
 
     if verbose:
@@ -954,7 +953,8 @@ def get_block_cost(resource, point, layer, verbose=False):
         print('layer_size: ', layer_size)
         print('block costs: ', block_costs)
 
-    return block_costs
+    # TODO: DELETE
+    return sum(block_costs)
 
 
 def get_cost(resource, point, layer, verbose=False):
@@ -976,16 +976,18 @@ def get_cost(resource, point, layer, verbose=False):
     total_access_cost = get_total_access_cost(resource, array_cost)
     assert len(total_access_cost) == len(access_list)
 
-    total_cost = 0.0
+    _total_cost = 0.0
     for i in range(len(total_access_cost)):
         ''' List of total access of each buffer at level i'''
         if not isinstance(access_list[i][0], list):
-            buffer_access = list(map(mul, access_list[i], layer_size))
-            total_cost += sum(buffer_access) * total_access_cost[i]
+            buffer_access = np.array(list(map(mul, access_list[i], layer_size)))
+            _total_cost += sum(buffer_access) * np.array(total_access_cost[i])
         else:
             for j in range(len(access_list[i])):
-                buffer_access = list(map(mul, access_list[i][j], layer_size))
-                total_cost += sum(buffer_access) * total_access_cost[i][j]
+                buffer_access = np.array(list(map(mul, access_list[i][j], layer_size)))
+                _total_cost += sum(buffer_access) * total_access_cost[i][j]
+
+    total_cost = _total_cost[0]
 
     if verbose:
         print('access_cost: ', total_access_cost)
@@ -995,6 +997,8 @@ def get_cost(resource, point, layer, verbose=False):
         print('block_size_list: ', block_size_list)
         print('layer_size: ', layer_size)
         print('total cost: ', total_cost)
+        # TODO: DELETE
+        return total_cost
 
     # return total_cost
     return total_cost, total_access_cost, access_list, layer_size
