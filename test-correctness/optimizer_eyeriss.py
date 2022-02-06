@@ -3,6 +3,7 @@ Simple test case for checking get_cost
 '''
 import unittest
 import cnn_mapping as cm
+from cnn_mapping import Schedule
 
 
 class TestOptimizer(unittest.TestCase):
@@ -66,9 +67,9 @@ class TestOptimizer(unittest.TestCase):
         #                 cm.le.OX: [[5, 1, 1], None, None], cm.le.OC: [[4, 16, 4], None, None],
         #                 cm.le.ON: [[6, 1, 1], None, None]}
 
-        schedule_hint = {cm.le.FX: [[0, 3, 1], None, None],
-                         cm.le.FY: [[2, 1, 3], None, None], cm.le.OY: [[3, 1, 13], None, None],
-                         cm.le.OC: [[4, None, 4], None, None]}
+        schedule_hint = Schedule({cm.le.FX: [[0, 3, 1], None, None],
+                                  cm.le.FY: [[2, 1, 3], None, None], cm.le.OY: [[3, 1, 13], None, None],
+                                  cm.le.OC: [[4, None, 4], None, None]})
 
         resource = cm.Resource(capacity_list, access_cost_list, static_cost_list, para_count_list, 0, [1, 0, 0], [2])
         layer = cm.Layer(256, 384, 13, 13, 3, 3, 1)
@@ -77,8 +78,7 @@ class TestOptimizer(unittest.TestCase):
         level1 = cm.cost_model.get_level_cost(resource, opt_result[1], layer, 1)
         level2 = cm.cost_model.get_level_cost(resource, opt_result[1], layer, 2)
         level00 = cm.cost_model.get_array_and_curr_level_cost(resource, opt_result[1], layer, 1) - level1
-        print
-        level0, level00, level1, level2
+        print(level0, level00, level1, level2)
         cm.utils.print_loop_nest(opt_result[1])
 
     ''' 

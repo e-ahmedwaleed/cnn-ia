@@ -779,7 +779,7 @@ def get_utilization(utilized, resource):
     return utilized * 1.0 / total
 
 
-def dataflow_exploration(resource, layer, file_name, verbose=False):
+def dataflow_exploration(resource, layer, file_name="serialized", verbose=False):
     '''
     Dataflow exploration.
 

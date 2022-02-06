@@ -953,8 +953,7 @@ def get_block_cost(resource, point, layer, verbose=False):
         print('layer_size: ', layer_size)
         print('block costs: ', block_costs)
 
-    # TODO: DELETE
-    return sum(block_costs)
+    return block_costs
 
 
 def get_cost(resource, point, layer, verbose=False):
