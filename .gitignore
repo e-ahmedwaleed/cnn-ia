@@ -1,6 +1,2 @@
-.*
-_*
-*/_*
-data/
-output/
-CNN-*
+.idea
+run.sh
