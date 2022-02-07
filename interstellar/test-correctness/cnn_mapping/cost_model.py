@@ -718,9 +718,9 @@ def valid_mapping_point_current_level(resource, point, layer, level, verbose=Fal
     partitioning = list(zip(*(point.loop_partitionings)))
     valid_para = valid_partition_number(resource, partitioning, level)
 
-    if verbose == 3:
-        print("Level ", level, ": Partitioned block size fit in bank: ", valid_size)
-        print("Level ", level, ": Partition number is valid: ", valid_para)
+    # if verbose == 3:
+    # print("Level ", level, ": Partitioned block size fit in bank: ", valid_size)
+    # print("Level ", level, ": Partition number is valid: ", valid_para)
 
     return valid_size and valid_para
 
@@ -811,8 +811,8 @@ def get_array_level_cost(resource, point, layer_size, level, next_level_access, 
         buffer_access = list(map(mul, level_access[i], layer_size))
         total_cost += sum(buffer_access) * level_cost[i]
 
-    if verbose >= 3:
-        print("Level ", level, " array level access: ", level_access)
+    # if verbose >= 3:
+    # print("Level ", level, " array level access: ", level_access)
 
     return total_cost
 
@@ -844,8 +844,8 @@ def get_array_and_curr_level_cost(resource, point, layer, level, verbose=False):
     # operand_costs = [access_cost * num_accesses for access_cost,num_accesses in zip(total_buffer_access,resource.access_cost[level]) ]
     # level_cost = sum(operand_costs)
 
-    if verbose >= 3:
-        print("Level ", level, " access: ", buffer_level_access)
+    # if verbose >= 3:
+    # print("Level ", level, " access: ", buffer_level_access)
 
     level_cost += get_array_level_cost(resource, point, layer_size, level - 1, level_access, verbose)
 
@@ -878,8 +878,8 @@ def get_level_cost(resource, point, layer, level, verbose=False):
     # operand_costs = [access_cost * num_accesses for access_cost,num_accesses in zip(buffer_access,resource.access_cost[level]) ]
     # level_cost = sum(operand_costs)
 
-    if verbose >= 3:
-        print("Level", level, " access: ", level_access)
+    # if verbose >= 3:
+    # print("Level", level, " access: ", level_access)
     return level_cost
 
 
@@ -888,8 +888,8 @@ def get_total_access(resource, point, layer, verbose=False):
 
     access_list, array_cost = get_access(point, layer, resource)
 
-    if verbose >= 3:
-        print("access breakdown: ", access_list)
+    # if verbose >= 3:
+    # print("access breakdown: ", access_list)
 
     total_level_access = []
     for i in range(len(access_list)):
@@ -946,12 +946,12 @@ def get_block_cost(resource, point, layer, verbose=False):
         block_costs = list(map(add, block_cost, block_costs))
 
     if verbose:
-        print('access_list: ', access_list)
+        # print('access_list: ', access_list)
         bank_size_list, block_size_list = get_block_sizes(num_levels, point, layer)
-        print('bank_size_list: ', bank_size_list)
-        print('block_size_list: ', block_size_list)
-        print('layer_size: ', layer_size)
-        print('block costs: ', block_costs)
+        # print('bank_size_list: ', bank_size_list)
+        # print('block_size_list: ', block_size_list)
+        # print('layer_size: ', layer_size)
+        # print('block costs: ', block_costs)
 
     return block_costs
 
@@ -989,13 +989,13 @@ def get_cost(resource, point, layer, verbose=False):
     total_cost = _total_cost[0]
 
     if verbose:
-        print('access_cost: ', total_access_cost)
-        print('access_list: ', access_list)
+        # print('access_cost: ', total_access_cost)
+        # print('access_list: ', access_list)
         bank_size_list, block_size_list = get_block_sizes(num_levels, point, layer)
-        print('bank_size_list: ', bank_size_list)
-        print('block_size_list: ', block_size_list)
-        print('layer_size: ', layer_size)
-        print('total cost: ', total_cost)
+        # print('bank_size_list: ', bank_size_list)
+        # print('block_size_list: ', block_size_list)
+        # print('layer_size: ', layer_size)
+        # print('total cost: ', total_cost)
 
     # return total_cost
     return total_cost, total_access_cost, access_list, layer_size

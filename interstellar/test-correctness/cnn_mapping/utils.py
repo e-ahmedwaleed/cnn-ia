@@ -18,4 +18,4 @@ def print_loop_nest(point):
 
         order_lists.append(order_list)
 
-    print(order_lists, para_dims)
+    # print(order_lists, para_dims)

@@ -569,8 +569,8 @@ def blocking_partitioning_generator_function(resource, layer, schedule, verbose=
     blocking_generator = blocking_generator_function(resource, layer, schedule, verbose)
 
     for loop_blocking in blocking_generator:
-        if verbose == 3:
-            print("loop_tilling: ", loop_blocking)
+        # if verbose == 3:
+        # print("loop_tilling: ", loop_blocking)
 
         loop_blocking_reshape = list(zip(*loop_blocking))
         pb_generator = parallel_blocking_generator_function(loop_blocking_reshape, resource, layer, schedule)
@@ -585,25 +585,26 @@ def blocking_partitioning_generator_function(resource, layer, schedule, verbose=
             blocking_list = list(zip(*partitioned_loop_blocking_reshape))
             partitioning_list = list(zip(*partition))
 
-            if verbose == 3:
-                print("loop_blocking: ", blocking_list)
-                print("loop_partition: ", partitioning_list)
-                print("para_dimension: ", para_dim)
+            # if verbose == 3:
+            # print("loop_blocking: ", blocking_list)
+            # print("loop_partition: ", partitioning_list)
+            # print("para_dimension: ", para_dim)
 
             dummy_mapping_point = MappingPoint(None, blocking_list, partitioning_list, para_dim)
             if cost_model.valid_partitioning(resource, dummy_mapping_point, layer, verbose):
                 #                if cost_model.valid_mapping_point(resource, dummy_mapping_point, layer, verbose):
-                if verbose == 3:
-                    print("Valid")
-                    print("")
+                # if verbose == 3:
+                # print("Valid")
+                # print("")
                 yield [blocking_list, partitioning_list, para_dim]
             #                else:
             #                   print "invalid"
             #                    print ""
             else:
-                if verbose == 3:
-                    print("invalid")
-                    print("")
+                pass
+            #   if verbose == 3:
+            # print("invalid")
+            # print("")
 
 
 def opt_get_best_loop_order(resource, layer, point, verbose=False):
@@ -657,15 +658,14 @@ def opt_get_best_loop_order(resource, layer, point, verbose=False):
                 smallest_cost = curr_cost
 
             if verbose >= 3:
-                print("Level", level, "Current order:", curr_level_order, "     Best order:", best_curr_level_order)
-                print("Level", level, "Current energy:", '%20d' % curr_cost, "     Best energy:",
-                      '%20d' % smallest_cost)
-                print("")
+                # print("Level", level, "Current order:", curr_level_order, "     Best order:", best_curr_level_order)
+                # print("Level", level, "Current energy:", '%20d' % curr_cost, "     Best energy:",'%20d' % smallest_cost)
+                # print("")
 
-            # LMEI later, instead of using mac_capacity, we could use 4-level memory model, treat mac_capacity
-            #  as the innermost memory level for output.
-            if resource.mac_capacity == 0 and level == 0:
-                break  # Here the author thinks the loop order in innermost level doesn't matter, thus break
+                # LMEI later, instead of using mac_capacity, we could use 4-level memory model, treat mac_capacity
+                #  as the innermost memory level for output.
+                if resource.mac_capacity == 0 and level == 0:
+                    break  # Here the author thinks the loop order in innermost level doesn't matter, thus break
 
         best_loop_order.append(best_curr_level_order)
         best_cost += smallest_cost
@@ -695,8 +695,8 @@ def opt_mapping_point_generator_function(resource, layer, schedule=None, verbose
            at this early stage, so that we can avoid generating all the loop orders for 
            an invalid blocking_partitioning 
         '''
-        if verbose >= 2:
-            print("Find best order for schedule: ", blocking_partitioning)
+        # if verbose >= 2:
+        # print("Find best order for schedule: ", blocking_partitioning)
 
         [blocking, partitioning, para_dim] = blocking_partitioning
         dummy_mapping_point = MappingPoint(None, blocking, partitioning, para_dim)
@@ -705,10 +705,10 @@ def opt_mapping_point_generator_function(resource, layer, schedule=None, verbose
         if cost < smallest_cost:
             smallest_cost = cost
             best_mapping_point = MappingPoint(loop_order, blocking, partitioning, para_dim)
-            if verbose >= 2:
-                print("best loop order: ", best_mapping_point.loop_orders)
-                print("Update smallest cost: ", smallest_cost)
-                print("Update best schedule: ", utils.print_loop_nest(best_mapping_point))
+        #   if verbose >= 2:
+        # print("best loop order: ", best_mapping_point.loop_orders)
+        # print("Update smallest cost: ", smallest_cost)
+        # print("Update best schedule: ", utils.print_loop_nest(best_mapping_point))
 
     assert best_mapping_point, "No valid mapping point found."
     return smallest_cost, best_mapping_point
@@ -802,8 +802,8 @@ def dataflow_exploration(resource, layer, file_name="serialized", verbose=False)
            at this early stage, so that we can avoid generating all the loop orders for 
            an invalid blocking_partitioning 
         '''
-        if verbose >= 2:
-            print("Find best order for schedule: ", blocking_partitioning)
+        # if verbose >= 2:
+        # print("Find best order for schedule: ", blocking_partitioning)
 
         [blocking, partitioning, para_dim] = blocking_partitioning
         dummy_mapping_point = MappingPoint(None, blocking, partitioning, para_dim)
@@ -816,13 +816,13 @@ def dataflow_exploration(resource, layer, file_name="serialized", verbose=False)
         if unrolled_loops not in dataflow_tb or dataflow_tb[unrolled_loops][0] > cost:
             best_mapping_point = MappingPoint(loop_order, blocking, partitioning, para_dim)
             dataflow_tb[unrolled_loops] = (cost, utilization, best_mapping_point)  # TODO utilization
-            if verbose:
-                print("unrolled loops: ", unrolled_loops, " with utilization ", utilization)
-                # print "best loop order: ", best_mapping_point.loop_orders
-                print("blocking: ", blocking)
-                print("partitioning: ", partitioning)
-                print("Update smallest cost: ", dataflow_tb[unrolled_loops][0])
-                # print "Update best shedule: ", utils.print_loop_nest(best_mapping_point)
+        #   if verbose:
+        # print("unrolled loops: ", unrolled_loops, " with utilization ", utilization)
+        # print "best loop order: ", best_mapping_point.loop_orders
+        # print("blocking: ", blocking)
+        # print("partitioning: ", partitioning)
+        # print("Update smallest cost: ", dataflow_tb[unrolled_loops][0])
+        # print "Update best shedule: ", utils.print_loop_nest(best_mapping_point)
 
     # assert best_mapping_point, "No valid mapping point found."
     pickle_file_name = file_name + ".pickle"

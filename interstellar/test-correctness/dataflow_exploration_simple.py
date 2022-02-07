@@ -24,7 +24,7 @@ class TestDataflow(unittest.TestCase):
         layer = cm.Layer(32, 32, 16, 16, 3, 3, 4)
 
         dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer, verbose=True)
-        print("dataflows:", dataflow_tb)
+        # print("dataflows:", dataflow_tb)
 
 
 if __name__ == '__main__':

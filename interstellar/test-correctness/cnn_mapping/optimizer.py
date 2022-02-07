@@ -19,10 +19,10 @@ def opt_optimizer(resource, layer, hint=None, verbose=False):
     # total_cost = cost_model.get_cost(resource, best_mapping_point, layer, verbose)
     # assert total_cost == smallest_cost
 
-    if verbose:
-        print(smallest_cost)
-        print("Best mapping_point: ", best_mapping_point.loop_blockings, best_mapping_point.loop_partitionings,
-              best_mapping_point.loop_orders)
+    # if verbose:
+    # print(smallest_cost)
+    # print("Best mapping_point: ", best_mapping_point.loop_blockings, best_mapping_point.loop_partitionings,best_mapping_point.loop_orders)
+
     return [smallest_cost, best_mapping_point, access_list]
 
 
@@ -36,19 +36,18 @@ def optimizer(resource, layer, hint=None, verbose=False):
         cost = cost_model.get_cost(resource, mapping_point, layer, verbose)
         # if verbose:
         #    print "Current cost: ", cost
-        #     print "Current mapping_point: ", mapping_point.loop_blockings, mapping_point.loop_orders
+        #    print "Current mapping_point: ", mapping_point.loop_blockings, mapping_point.loop_orders
 
         if cost < smallest_cost:
             smallest_cost = cost
             best_mapping_point = mapping_point
-            if verbose:
-                print("Current smallest cost: ", smallest_cost)
-                print("Current best mapping_point: ", mapping_point.loop_blockings, mapping_point.loop_orders)
+        #   if verbose:
+        # print("Current smallest cost: ", smallest_cost)
+        # print("Current best mapping_point: ", mapping_point.loop_blockings, mapping_point.loop_orders)
     # print counter
 
-    if verbose:
-        print(smallest_cost)
-        print("Best mapping_point: ", best_mapping_point.loop_blockings, mapping_point.loop_partitionings,
-              best_mapping_point.loop_orders)
+    # if verbose:
+    # print(smallest_cost)
+    # print("Best mapping_point: ", best_mapping_point.loop_blockings, mapping_point.loop_partitionings, best_mapping_point.loop_orders)
 
     return [smallest_cost, best_mapping_point]

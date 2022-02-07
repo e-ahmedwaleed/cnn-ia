@@ -84,7 +84,7 @@ class TestOptimizer(unittest.TestCase):
         level1 = cm.cost_model.get_level_cost(resource, opt_result[1], layer, 1)
         level2 = cm.cost_model.get_level_cost(resource, opt_result[1], layer, 2)
         level00 = cm.cost_model.get_array_and_curr_level_cost(resource, opt_result[1], layer, 1) - level1
-        print(level0, level00, level1, level2)
+        # print(level0, level00, level1, level2)
         cm.utils.print_loop_nest(opt_result[1])
 
     ''' 
