@@ -2,5 +2,8 @@
 _*
 */_*
 venv/
+data/
+output/
+CNN-*
 
 run*
