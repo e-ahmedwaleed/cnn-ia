@@ -22,7 +22,7 @@ while True:
         continue
 
 
-def run_python(_py_file, _stdout=False, _stderr=False):
+def run_python(_py_file, _stdout=False, _stderr=True):
     _cmd = "python "
     if os.path.exists("./venv/Scripts/python.exe"):
         _cmd = "./venv/Scripts/python.exe "
@@ -39,4 +39,18 @@ def run_python(_py_file, _stdout=False, _stderr=False):
 if choice == 1:
     print(run_python("./phase-1-extractor/main.py").returncode == 0)
 elif choice == 2:
-    print("interstellar correctness tests...")
+    from os import walk
+
+    (_, _, filenames) = next(walk("./interstellar/test-correctness/"))
+    test_files = filenames[1:]
+
+    tests = []
+    for test_file in test_files:
+        import threading
+
+        t = threading.Thread(target=run_python, args=("./interstellar/test-correctness/" + test_file,))
+        tests.append(t)
+        t.start()
+
+    for test in tests:
+        test.join()
