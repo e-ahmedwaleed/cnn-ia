@@ -1,4 +1,9 @@
 import os
+import sys
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+
 import numpy as np
 import argparse
 import time
@@ -72,7 +77,7 @@ def mac_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
 
 
 def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False):
-    assert arch_info["parallel_count"] > 1, \
+    assert arch_info["parallel_count"][0] > 1, \
         "parallel count has to be more than 1 for dataflow exploration"
 
     resource = cm.Resource.arch(arch_info)
