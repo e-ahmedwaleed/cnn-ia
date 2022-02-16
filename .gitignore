@@ -1,4 +1,10 @@
+.*
 _*
 */_*
-.idea
-run.sh
+venv/
+data/
+*output/
+CNN-*
+
+run*
+*.txt
