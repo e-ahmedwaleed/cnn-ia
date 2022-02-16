@@ -10,7 +10,11 @@ def list_files(_dir):
     return files
 
 
-def run_python(_py_file, _stdout=None, _stderr=True):
+def msg_of(exception):
+    return exception[exception.rfind(": ") + 2:].replace("\n", "")
+
+
+def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
     cmd = "python "
     if os.path.exists("./venv/Scripts/python.exe"):
         cmd = "./venv/Scripts/python.exe "
@@ -20,20 +24,26 @@ def run_python(_py_file, _stdout=None, _stderr=True):
         print(cmd)
         return
 
-    proc = subprocess.run(cmd.split(), capture_output=True)
-
-    if proc.returncode == 0:
+    try:
+        proc = subprocess.run(cmd.split(), timeout=_timeout, capture_output=True)
+    except subprocess.TimeoutExpired:
         if _stdout:
+            file = open(_stdout.replace(".txt", ".timeout"), "w")
+            file.write(str(_timeout) + " sec+")
+            file.close()
+        return
+
+    if _stdout:
+        if proc.returncode == 0:
             file = open(_stdout, "w")
             file.write(proc.stdout.decode('ascii'))
-            file.close()
-    else:
-        err = proc.stderr.decode('ascii')
-        if "AssertionError" in err:
-            index = err.find("AssertionError")
-            print(cmd + "\n" + err[index:])
-
-    if _stderr:
+        else:
+            # TODO: assertions should be handled in a special manner.
+            file = open(_stdout.replace(".txt", ".exception"), "w")
+            # msg_of(proc.stderr.decode('ascii'))
+            file.write(proc.stderr.decode('ascii'))
+        file.close()
+    elif _stderr:
         print(proc.stderr.decode('ascii'))
 
     return proc
@@ -79,7 +89,7 @@ def run_interstellar_samples(_optimizer_type):
     import random
     threads = []
 
-    for i in range(5):
+    for i in range(10):
         layer = random.choice(layers)
         arch = random.choice(archs)
         schedule = random.choice(schedules)
@@ -88,9 +98,10 @@ def run_interstellar_samples(_optimizer_type):
             output = "dataflow_explore-" + name_of(arch) + "-" + name_of(layer) + ".txt"
         else:
             cmd = "./interstellar/main.py -v -s " + schedule + " " + _optimizer_type + " " + arch + " " + layer
-            output = _optimizer_type + "-" + name_of(schedule) + "-" + name_of(arch) + "-" + name_of(layer) + ".txt"
+            output = _optimizer_type + "-" + name_of(schedule) + "-" + name_of(arch) + "-" + name_of(
+                layer) + ".txt"
 
-        t = threading.Thread(target=run_python, args=(cmd, output, True,))
+        t = threading.Thread(target=run_python, args=(cmd, "./output/" + output, False, 300,))
         threads.append(t)
         t.start()
 

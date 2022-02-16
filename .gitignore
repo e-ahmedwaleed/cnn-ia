@@ -3,7 +3,7 @@ _*
 */_*
 venv/
 data/
-output/
+*output/
 CNN-*
 
 run*
