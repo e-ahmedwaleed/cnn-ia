@@ -3,6 +3,7 @@ import threading
 import subprocess
 
 DEBUG = False
+TIMEOUT = 10
 
 
 def list_files(_dir):
@@ -10,8 +11,24 @@ def list_files(_dir):
     return files
 
 
-def msg_of(exception):
-    return exception[exception.rfind(": ") + 2:].replace("\n", "")
+def create_dir(_path):
+    try:
+        os.mkdir(_path)
+        return True
+    except OSError:
+        return False
+
+
+def insert_instead(_file, _folder):
+    return _file[0:_file.rfind("/")] + "/" + _folder
+
+
+def name_of(_file):
+    return _file[_file.rfind("/") + 1:].replace(".json", "")
+
+
+def msg_of(_exception):
+    return _exception[_exception.rfind(": ") + 2:].replace(".", "").replace("\n", "").replace("\r", "")
 
 
 def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
@@ -28,8 +45,13 @@ def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
         proc = subprocess.run(cmd.split(), timeout=_timeout, capture_output=True)
     except subprocess.TimeoutExpired:
         if _stdout:
+            timeouts_dir = insert_instead(_stdout, "timeouts")
+            create_dir(timeouts_dir)
+            timeout_dir = timeouts_dir + "/" + str(_timeout) + " secs"
+            create_dir(timeout_dir)
+            _stdout = timeout_dir + "/" + name_of(_stdout)
             file = open(_stdout.replace(".txt", ".timeout"), "w")
-            file.write(str(_timeout) + " sec+")
+            file.write("timeout... " + str(_timeout) + " sec(s)")
             file.close()
         return
 
@@ -38,9 +60,12 @@ def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
             file = open(_stdout, "w")
             file.write(proc.stdout.decode('ascii'))
         else:
-            # TODO: assertions should be handled in a special manner.
+            exceptions_dir = insert_instead(_stdout, "exceptions")
+            create_dir(exceptions_dir)
+            exception_dir = exceptions_dir + "/" + msg_of(proc.stderr.decode('ascii'))
+            create_dir(exception_dir)
+            _stdout = exception_dir + "/" + name_of(_stdout)
             file = open(_stdout.replace(".txt", ".exception"), "w")
-            # msg_of(proc.stderr.decode('ascii'))
             file.write(proc.stderr.decode('ascii'))
         file.close()
     elif _stderr:
@@ -76,36 +101,57 @@ def list_samples(_type):
     return samples
 
 
-def name_of(file):
-    return file[file.rfind("/") + 1:].replace(".json", "")
-
-
 # noinspection SpellCheckingInspection
 def run_interstellar_samples(_optimizer_type):
     layers = list_samples("layer")
     archs = list_samples("arch")
     schedules = list_samples("schedule")
 
-    import random
-    threads = []
+    output_dir = "interstellar-output"
+    create_dir(output_dir)
 
-    for i in range(10):
-        layer = random.choice(layers)
-        arch = random.choice(archs)
-        schedule = random.choice(schedules)
-        if _optimizer_type == "dataflow_explore":
-            cmd = "./interstellar/main.py -v dataflow_explore " + arch + " " + layer
-            output = "dataflow_explore-" + name_of(arch) + "-" + name_of(layer) + ".txt"
-        else:
-            cmd = "./interstellar/main.py -v -s " + schedule + " " + _optimizer_type + " " + arch + " " + layer
-            output = _optimizer_type + "-" + name_of(schedule) + "-" + name_of(arch) + "-" + name_of(
-                layer) + ".txt"
+    optimizer_dir = output_dir + "/"
+    if _optimizer_type == "basic":
+        optimizer_dir += "loop-blocking"
+    elif _optimizer_type == "mem_explore":
+        optimizer_dir += "memory-capacity"
+    else:
+        optimizer_dir += "dataflow"
+    create_dir(optimizer_dir)
 
-        t = threading.Thread(target=run_python, args=(cmd, "./output/" + output, False, 300,))
-        threads.append(t)
-        t.start()
+    for layer in layers:
+        layer_dir = optimizer_dir + "/" + name_of(layer)
+        create_dir(layer_dir)
+        threads = []
+        for arch in archs:
+            arch_dir = layer_dir + "/" + name_of(arch)
+            if _optimizer_type == "dataflow_explore":
+                cmd = "./interstellar/main.py -v dataflow_explore " + arch + " " + layer
+                output = arch_dir + ".txt"
 
-    for thread in threads:
-        thread.join()
+                t = threading.Thread(target=run_python, args=(cmd, output, False, TIMEOUT,))
+                threads.append(t)
+                t.start()
+            else:
+                threads = []
+                create_dir(arch_dir)
+                for schedule in schedules:
+                    schedule_file = arch_dir + "/" + name_of(schedule)
+                    cmd = "./interstellar/main.py -v -s " + schedule + " " + _optimizer_type + " " + arch + " " + layer
+                    output = schedule_file + ".txt"
+
+                    t = threading.Thread(target=run_python, args=(cmd, output, False, TIMEOUT,))
+                    threads.append(t)
+                    t.start()
+
+                for schedule_thread in threads:
+                    schedule_thread.join()
+                if DEBUG:
+                    return
+
+        for arch_thread in threads:
+            arch_thread.join()
+        if DEBUG:
+            return
 
     return
