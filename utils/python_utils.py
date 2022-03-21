@@ -31,6 +31,13 @@ def msg_of(_exception):
     return _exception[_exception.rfind(": ") + 2:].replace(".", "").replace("\n", "").replace("\r", "")
 
 
+def print_strikethrough(_text):
+    text = ""
+    for char in _text:
+        text += char + '\u0336'
+    print(text)
+
+
 def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
     cmd = "python "
     if os.path.exists("./venv/Scripts/python.exe"):

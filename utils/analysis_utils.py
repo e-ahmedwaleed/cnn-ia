@@ -1,5 +1,10 @@
 import os
-from utils.python_utils import list_files
+from utils.python_utils import name_of, list_files
+
+
+def file_name(_path):
+    name = name_of(_path)
+    return name[0:name.rfind(".")]
 
 
 def list_dirs(_dir):
@@ -27,18 +32,47 @@ def list_outputs(_arch):
     return o_files
 
 
-# noinspection SpellCheckingInspection
+def identify_subdir(_parent_dir, _file):
+    return _file[_file.rfind(_parent_dir) + len(_parent_dir):_file.rfind('/')]
+
+
+layers_set = set()
+archs_set = set()
+schedules_set = set()
+outputs_set = set()
+
+
+def save_outputs(_optimizer_type, _outputs):
+    print(len(layers_set))
+    print(len(archs_set))
+    print(len(schedules_set))
+    print(len(outputs_set))
+
+
 def analyze_interstellar_samples(_optimizer_type):
     optimizer_dir = "./interstellar-output/" + _optimizer_type + "/"
     layers = list_dirs(optimizer_dir)
 
+    outputs = {}
+
     for layer in layers:
+        outputs[layer] = {}
         layer_dir = optimizer_dir + layer + "/"
         if _optimizer_type == "dataflow":
-            list_outputs(layer_dir)
+            for output in list_outputs(layer_dir):
+                outputs[layer][file_name(output)] = identify_subdir(layer, output)
+                outputs_set.add(identify_subdir(layer, output))
+                archs_set.add(file_name(output))
         else:
             archs = list_dirs(layer_dir)
             for arch in archs:
+                outputs[layer][arch] = {}
                 arch_dir = layer_dir + arch + "/"
-                list_outputs(arch_dir)
-        return
+                for output in list_outputs(arch_dir):
+                    outputs[layer][arch][file_name(output)] = identify_subdir(arch, output)
+                    outputs_set.add(identify_subdir(arch, output))
+                    schedules_set.add(file_name(output))
+                archs_set.add(arch)
+        layers_set.add(layer)
+
+    save_outputs(_optimizer_type, outputs)
