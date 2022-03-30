@@ -3,8 +3,8 @@ _*
 */_*
 venv/
 data/
-*output/
 CNN-*
+interstellar-output*
 
 run*
 *.txt
