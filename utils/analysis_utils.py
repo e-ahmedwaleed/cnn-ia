@@ -52,13 +52,54 @@ schedules_set = set()
 outputs_set = set()
 
 
-def save_output_set(_dir, _set):
+def save_dataflow(_dir, _outputs):
     create_dir(_dir)
+
+    _layers_set = sorted(layers_set)
+    _archs_set = sorted(archs_set)
+
+    file = open(_dir + 'summary.csv', 'w')
+    for arch in _archs_set:
+        file.write(" ," + arch)
+    file.write(",\n")
+    for layer in _layers_set:
+        file.write(layer + ", ")
+        for arch in _archs_set:
+            label = _outputs[layer][arch]
+            file.write(label + ", ")
+        file.write('\n')
+    file.close()
+
+
+def save_output_set(_dir, _set, _outputs):
+    create_dir(_dir)
+
+    _layers_set = sorted(layers_set)
+    _archs_set = sorted(archs_set)
+    _schedules_set = sorted(schedules_set)
+
+    ranking = {}
 
     for item in _set:
         file = open(_dir + str(item) + '.csv', 'w')
+        ranking[item] = 0
+        if "layer" in _dir:
+            for schedule in _schedules_set:
+                file.write(" ," + schedule)
+            file.write(",\n")
+            for arch in _archs_set:
+                file.write(arch + ", ")
+                for schedule in _schedules_set:
+                    label = _outputs[item][arch][schedule]
+                    if "ok {" in label:
+                        ranking[item] = ranking[item] + 1
+                    file.write(label + ", ")
+                file.write('\n')
         file.close()
+
     file = open(_dir + '.ranking', 'w')
+    for item in sorted(ranking, key=ranking.get, reverse=True):
+        file.write(str(item) + " (" + str(ranking[item]) + ")\n")
     file.close()
 
 
@@ -68,14 +109,15 @@ def save_outputs(_optimizer_type, _outputs):
     optimizer_dir = output_dir + _optimizer_type + "/"
     create_dir(optimizer_dir)
 
-    layers_dir = optimizer_dir + "layer/"
-    save_output_set(layers_dir, layers_set)
-    archs_dir = optimizer_dir + "arch/"
-    save_output_set(archs_dir, archs_set)
-
     if _optimizer_type != "dataflow":
-        schedules_dir = optimizer_dir + "schedule/"
-        save_output_set(schedules_dir, schedules_set)
+        layers_dir = optimizer_dir + "layer/"
+        save_output_set(layers_dir, layers_set, _outputs)
+        # archs_dir = optimizer_dir + "arch/"
+        # save_output_set(archs_dir, archs_set, _outputs)
+        # schedules_dir = optimizer_dir + "schedule/"
+        # save_output_set(schedules_dir, schedules_set, _outputs)
+    else:
+        save_dataflow(optimizer_dir, _outputs)
 
     file = open(optimizer_dir + 'labels.txt', 'w')
     for label in sorted(outputs_set):
