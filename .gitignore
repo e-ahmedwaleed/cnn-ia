@@ -4,7 +4,7 @@ _*
 venv/
 data/
 CNN-*
-interstellar-output*
+phase-1-extractor-output*
 
 run*
 *.txt

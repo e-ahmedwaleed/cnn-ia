@@ -2,8 +2,7 @@ import os
 import threading
 import subprocess
 
-DEBUG = False
-TIMEOUT = 10
+TIMEOUT = 100
 
 
 def list_files(_dir):
@@ -43,10 +42,6 @@ def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
     if os.path.exists("./venv/Scripts/python.exe"):
         cmd = "./venv/Scripts/python.exe "
     cmd += _py_file
-
-    if DEBUG:
-        print(cmd)
-        return
 
     try:
         proc = subprocess.run(cmd.split(), timeout=_timeout, capture_output=True)
@@ -108,7 +103,6 @@ def list_samples(_type):
     return samples
 
 
-# noinspection SpellCheckingInspection
 def run_interstellar_samples(_optimizer_type):
     layers = list_samples("layer")
     archs = list_samples("arch")
@@ -153,12 +147,8 @@ def run_interstellar_samples(_optimizer_type):
 
                 for schedule_thread in threads:
                     schedule_thread.join()
-                if DEBUG:
-                    return
 
         for arch_thread in threads:
             arch_thread.join()
-        if DEBUG:
-            return
 
     return
