@@ -6,13 +6,15 @@ from gui import utils
 from tensorflow.keras import datasets, layers, models
 from tensorflow.keras.utils import to_categorical
 
+from model.examples.cnn_model import CNNImplementation
+
 
 # noinspection SpellCheckingInspection
-class TensorflowImplementation(object):
+class TensorflowImplementation(CNNImplementation):
     def __init__(self):
         self.model = models.Sequential()
 
-    def generate_model(self, epochs):
+    def generate_model(self, path, epochs):
         """ Load and prepare the dataset """
 
         (train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data(path='mnist.npz')
@@ -27,7 +29,7 @@ class TensorflowImplementation(object):
         train_labels = to_categorical(train_labels)
         test_labels = to_categorical(test_labels)
 
-        """ Build/Train the model """
+        """ Build/Compile the model """
 
         # defining the model architecture
         self.model.add(layers.Conv2D(4, (3, 3), activation='relu', input_shape=(28, 28, 1)))
@@ -42,10 +44,10 @@ class TensorflowImplementation(object):
 
         """ Train the model """
 
-        # training the model
         self.model.fit(train_images, train_labels, epochs=epochs, validation_data=(test_images, test_labels))
 
-    def save_model(self, path):
+        """ Save/Convert the model """
+
         path = path + "/CNN-TensorFlow-mnist"
 
         utils.create_folder(path)

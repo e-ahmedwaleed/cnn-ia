@@ -1,10 +1,9 @@
 .*
-_*
-*/_*
 venv/
 data/
+output/
 CNN-*
-phase-1-extractor-output*
+*__pycache__
 
 run*
 *.txt

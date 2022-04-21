@@ -56,10 +56,6 @@ class ParametersExtractor(object):
         # Update status right now
         from PyQt5 import QtCore
         QtCore.QCoreApplication.processEvents()
-        # Freeze the program until netron is closed
-        import netron
-        utils.sleep(10)
-        netron.stop()
 
     def set_status(self, status):
         self.statusbar.showMessage(status)

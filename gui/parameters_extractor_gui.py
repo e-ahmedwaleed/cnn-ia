@@ -70,6 +70,7 @@ class ParametersExtractorGUI(object):
         self.modelLocationGB.setTitle("Model Location")
         self.browseButton.setText("...")
         self.modelLibraryGB.setTitle("Model Library")
+        # TODO: make it easier to do externally
         self.modelLibrary.setItemText(0, "ONNX")
         self.modelLibrary.setItemText(1, "PyTorch (DEBUG)")
         self.modelLibrary.setItemText(2, "TensorFlow (DEBUG)")

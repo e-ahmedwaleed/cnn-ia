@@ -13,6 +13,6 @@ def extract(path):
         netron.start(path)
         utils.sleep(1.0)
         utils.open_folder(dir_path)
-        return "Model Extracted Successfully (close the browser to continue using the program)"
+        return "Model Extracted Successfully (you might need to close the browser to continue using the program)"
     except:
         return "Model Extraction Failed!"

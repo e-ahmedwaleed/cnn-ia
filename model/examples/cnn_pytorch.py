@@ -3,6 +3,8 @@ import torch
 from torch import nn, optim
 from torchvision import datasets, transforms
 
+from model.examples.cnn_model import CNNImplementation
+
 
 # noinspection PyTypeChecker
 class Net(nn.Module):
@@ -34,7 +36,7 @@ class Net(nn.Module):
         return x
 
 
-class PyTorchImplementation(object):
+class PyTorchImplementation(CNNImplementation):
     def __init__(self):
         self.model = Net()
 
@@ -50,7 +52,7 @@ class PyTorchImplementation(object):
         # defining train_loader
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True)
 
-        """ Build/Train the model """
+        """ Build/Compile the model """
 
         # defining the optimizer
         optimizer = optim.Adam(self.model.parameters(), lr=0.01)
@@ -86,6 +88,8 @@ class PyTorchImplementation(object):
                 running_loss += loss.item()
             else:
                 print("Epoch {} - Training loss: {}".format(i + 1, running_loss / len(train_loader)))
+
+        """ Save/Convert the model """
 
         path = path + "/CNN-PyTorch-mnist.onnx"
         # noinspection PyUnboundLocalVariable
