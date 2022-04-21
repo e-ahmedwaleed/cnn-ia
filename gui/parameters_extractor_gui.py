@@ -46,9 +46,6 @@ class ParametersExtractorGUI(object):
         self.modelLibrary = QtWidgets.QComboBox(self.modelLibraryGB)
         self.modelLibrary.setGeometry(QtCore.QRect(20, 30, 141, 22))
         self.modelLibrary.setObjectName("modelLibrary")
-        self.modelLibrary.addItem("")
-        self.modelLibrary.addItem("")
-        self.modelLibrary.addItem("")
         self.extractButton = QtWidgets.QPushButton(self.centralwidget)
         self.extractButton.setGeometry(QtCore.QRect(440, 90, 181, 31))
         self.extractButton.setObjectName("extractButton")
@@ -70,12 +67,17 @@ class ParametersExtractorGUI(object):
         self.modelLocationGB.setTitle("Model Location")
         self.browseButton.setText("...")
         self.modelLibraryGB.setTitle("Model Library")
-        # TODO: make it easier to do externally
-        self.modelLibrary.setItemText(0, "ONNX")
-        self.modelLibrary.setItemText(1, "PyTorch (DEBUG)")
-        self.modelLibrary.setItemText(2, "TensorFlow (DEBUG)")
         self.extractButton.setText("Extract Parameters")
         self.generateButton.setText("Generate A Model")
+
+    def add_supported_libraries(self, libraries):
+        self.modelLibrary.addItem("")
+        self.modelLibrary.setItemText(0, "ONNX")
+        i = 1
+        for lib in libraries:
+            self.modelLibrary.addItem("")
+            self.modelLibrary.setItemText(i, lib + " (DEBUG)")
+            i += 1
 
     def attach_functionality(self, p_e):
         self.browse_model_location = p_e.browse_model_location

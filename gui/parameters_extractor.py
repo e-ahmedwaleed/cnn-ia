@@ -10,6 +10,8 @@ class ParametersExtractor(object):
 
     def __init__(self, gui: ParametersExtractorGUI):
 
+        gui.add_supported_libraries(["PyTorch", "TensorFlow"])
+
         self.modelLocation = gui.modelLocation
         self.browseButton = gui.browseButton
 
@@ -56,6 +58,12 @@ class ParametersExtractor(object):
         # Update status right now
         from PyQt5 import QtCore
         QtCore.QCoreApplication.processEvents()
+        # TODO: find a better solution
+        # Freeze the program until netron is closed,
+        # very ugly but netron has to be stopped.
+        import netron
+        utils.sleep(10)
+        netron.stop()
 
     def set_status(self, status):
         self.statusbar.showMessage(status)
