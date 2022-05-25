@@ -8,15 +8,70 @@ import numpy as np
 import argparse
 import time
 import cnn_mapping as cm
+import cnn_mapping.loop_enum as loops
+
+
+def generate_field_row_format(field_function):
+    table_height = loops.NUM
+    table_width = len(field_function(0))
+
+    _max = -1
+    for i in range(table_height):
+        if _max < max(field_function(i)):
+            _max = max(field_function(i))
+
+    column_width = max(len(str(_max)) + 6, 12)
+
+    row_format = '\t'
+    for j in range(table_width - 1):
+        row_format += "%-" + str(column_width) + "s "
+
+    return row_format + '%s'
+
+
+def mapping_config_field(title, field_function):
+    table_height = loops.NUM
+    table_width = len(field_function(0))
+
+    print(title)
+
+    row_format = generate_field_row_format(field_function)
+
+    header = ["MEM:\t\t"]
+    for j in range(table_width):
+        header.append("L" + str(j))
+    print(header[0] + row_format % tuple(header[1:]))
+
+    for i in range(table_height):
+        row = '\t' + loops.table[i] + ':\t\t'
+        print(row + row_format % field_function(i))
+
+    print()
+
+
+def tabulate_mapping_config(mapping_configuration):
+    mapping_config_field("Loop temporal blocking",
+                         mapping_configuration.loop_blocking)
+    mapping_config_field("Loop spatial partitioning",
+                         mapping_configuration.loop_partitioning)
+    mapping_config_field("Loop ordering (from the innermost)",
+                         mapping_configuration.loop_order)
 
 
 def basic_optimizer(arch_info, network_info, schedule_info=None, basic=False, verbose=False):
+    # Hardware resource specification
     resource = cm.Resource.arch(arch_info)
+    # NN layer specification
     layer = cm.Layer.layer(network_info)
-    schedule = cm.Schedule.schedule(schedule_info) if schedule_info != None else None
-    opt_result = cm.optimizer.opt_optimizer(resource, layer, schedule, verbose)
+    # Schedule hint specification
+    schedule = cm.Schedule.schedule(schedule_info) if schedule_info is not None else None
+
+    opt_result = cm.optimizer.opt_optimizer(resource, layer, schedule)
+    if verbose:
+        tabulate_mapping_config(opt_result[1])
 
     level_costs = cm.cost_model.get_level_costs(resource, opt_result[1], layer, verbose)
+
     if verbose or basic:
         print("best energy: ", opt_result[0])
         print("cost for each level: ", level_costs)  # TODO
