@@ -106,10 +106,10 @@ def schedule_details(loop):
     return "for ( " + loop[0] + ", " + str(int(loop[1])) + "b" + ", " + str(int(loop[2])) + "p )"
 
 
-def identify_loops(loops):
+def identify_loops_in_list_of_lists(list_of_loops):
     s = ''
-    for loop in loops:
-        s += str(le.table[loop[0]]) + ', '
+    for list_of_loop in list_of_loops:
+        s += str(le.table[list_of_loop[0]]) + ', '
     return s[:-2]
 
 
@@ -128,7 +128,7 @@ def tabulate_loop_blocking(loop_nest):
                 taps += '\t'
                 table += taps + schedule_details(loop) + '\n'
         if loop_nest[1][i]:
-            table += "\n\t\tspatially unrolled loops: " + identify_loops(loop_nest[1][i]) + '\n'
+            table += "\n\t\tspatially unrolled loops: " + identify_loops_in_list_of_lists(loop_nest[1][i]) + '\n'
 
     return table
 
@@ -203,22 +203,64 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
     print("optimal energy for all memory systems: ", np.min(np.array(energy_list)))
 
 
+def find_occurrences(string, char):
+    return [i for i, letter in enumerate(string) if letter == char]
+
+
+def identify_loops_in_brackets_str(str_of_loops):
+    s = ''
+    for i in find_occurrences(str_of_loops, '('):
+        s += str(le.table[int(str_of_loops[i + 1])]) + ', '
+    return s[:-2]
+
+
+def print_tabulated_dataflow_results(dataflow_tb):
+    for unrollment in sorted(dataflow_tb):
+        title = identify_loops_in_brackets_str(unrollment)
+        content = tabulate_mapping_config(dataflow_tb[unrollment][2])
+        note = "cost: " + str(dataflow_tb[unrollment][0]) + " pJ, util: " \
+               + str(dataflow_tb[unrollment][1] * 100) + "%"
+        print_output(title, content, note)
+    print()
+
+
+def print_tabulated_best_schedules(dataflow_tb):
+    best_cost = best_util = None
+    for unrollment in dataflow_tb:
+        if best_cost:
+            if dataflow_tb[unrollment][0] < dataflow_tb[best_cost][0]:
+                best_cost = unrollment
+            if dataflow_tb[unrollment][1] > dataflow_tb[best_util][1]:
+                best_util = unrollment
+        else:
+            best_cost = best_util = unrollment
+
+    print_output("BEST COST", tabulate_loop_blocking(cm.utils.print_loop_nest(dataflow_tb[best_cost][2])),
+                 "b: blocking factor, p: partitioning unit")
+    print_output("BEST UTILIZATION", tabulate_loop_blocking(cm.utils.print_loop_nest(dataflow_tb[best_util][2])),
+                 "b: blocking factor, p: partitioning unit")
+
+
 def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False):
-    assert arch_info["parallel_count"][0] > 1, \
+    # Ahmed - TODO: compare and fix other assertions
+    assert any(n > 1 for n in arch_info["parallel_count"]), \
         "parallel count has to be more than 1 for dataflow exploration"
 
+    # Hardware resource specification
     resource = cm.Resource.arch(arch_info)
+    # NN layer specification
     layer = cm.Layer.layer(network_info)
-    dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer, file_name, verbose)
+    # Generate unrolled loops mapping configurations table
+    dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer, file_name)
 
     if verbose:
-        print("dataflow table done ")
+        print_tabulated_dataflow_results(dataflow_tb)
+        print_tabulated_best_schedules(dataflow_tb)
 
     return dataflow_tb
 
 
 # -v -s ./samples/schedule/eyeriss_alex_conv3.json mem_explore ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
-# -v -s ./samples/schedule/eyeriss_alex_conv3.json dataflow_explore ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("type", choices=["basic", "mem_explore", "dataflow_explore"], help="optimizer type")
