@@ -8,11 +8,13 @@ import numpy as np
 import argparse
 import time
 import cnn_mapping as cm
-import cnn_mapping.loop_enum as loops
+import cnn_mapping.loop_enum as le
+
+STANDARD_WIDTH = 12
 
 
 def generate_field_row_format(field_function):
-    table_height = loops.NUM
+    table_height = le.NUM
     table_width = len(field_function(0))
 
     _max = -1
@@ -20,42 +22,89 @@ def generate_field_row_format(field_function):
         if _max < max(field_function(i)):
             _max = max(field_function(i))
 
-    column_width = max(len(str(_max)) + 6, 12)
+    column_width = max(len(str(_max)) + STANDARD_WIDTH / 2, STANDARD_WIDTH)
 
     row_format = '\t'
-    for j in range(table_width - 1):
-        row_format += "%-" + str(column_width) + "s "
+    for j in range(table_width):
+        row_format += "%-" + str(int(column_width)) + "s "
 
     return row_format + '%s'
 
 
 def mapping_config_field(title, field_function):
-    table_height = loops.NUM
+    table_height = le.NUM
     table_width = len(field_function(0))
 
-    print(title)
+    table = '  ' + title + '\n'
 
     row_format = generate_field_row_format(field_function)
 
-    header = ["MEM:\t\t"]
+    header = ["MEM:"]
     for j in range(table_width):
         header.append("L" + str(j))
-    print(header[0] + row_format % tuple(header[1:]))
+    table += (row_format % tuple(header)) + '\n'
 
     for i in range(table_height):
-        row = '\t' + loops.table[i] + ':\t\t'
-        print(row + row_format % field_function(i))
+        row = le.table[i] + ':'
+        table += (row_format % (row, *field_function(i))) + '\n'
 
-    print()
+    return table
 
 
 def tabulate_mapping_config(mapping_configuration):
-    mapping_config_field("Loop temporal blocking",
-                         mapping_configuration.loop_blocking)
-    mapping_config_field("Loop spatial partitioning",
-                         mapping_configuration.loop_partitioning)
-    mapping_config_field("Loop ordering (from the innermost)",
-                         mapping_configuration.loop_order)
+    table = ''
+    table += mapping_config_field("Loop temporal blocking (factors)",
+                                  mapping_configuration.loop_blocking)
+    table += mapping_config_field("Loop spatial partitioning (units)",
+                                  mapping_configuration.loop_partitioning)
+    table += mapping_config_field("Loop ordering (from the innermost)",
+                                  mapping_configuration.loop_order)
+    return table[:-1]
+
+
+def generate_cost_row_format(costs):
+    _max = max(costs)
+    table_width = len(costs)
+    column_width = max(len(str(_max)) + STANDARD_WIDTH / 2, STANDARD_WIDTH)
+
+    row_format = '\t'
+    for j in range(table_width + 1):
+        row_format += "%-" + str(int(column_width)) + "s "
+
+    return row_format + '%s'
+
+
+def tabulate_energy_costs(para_index, level_costs):
+    table_width = len(level_costs) - len(para_index)
+    row_format = generate_cost_row_format(level_costs)
+
+    table = ''
+
+    header = ["MEM:"]
+    for j in range(table_width):
+        header.append("L" + str(j))
+        if j in para_index:
+            header.append("L" + str(j) + "-PARA")
+
+    header.append("TOTAL")
+    table += (row_format % tuple(header)) + '\n'
+
+    row = 'ENERGY:'
+    table += (row_format % (row, *level_costs, sum(level_costs))) + " (pJ)"
+
+    return table
+
+
+def print_output(title, content):
+    length = len(title) + 2
+    top = '┌'
+    bot = ' │\n└'
+    for i in range(length):
+        top += '─'
+        bot += '─'
+    top += '┐\n│ '
+    bot += '┘\n'
+    print(top + title + bot + str(content))
 
 
 def basic_optimizer(arch_info, network_info, schedule_info=None, basic=False, verbose=False):
@@ -65,17 +114,15 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, basic=False, ve
     layer = cm.Layer.layer(network_info)
     # Schedule hint specification
     schedule = cm.Schedule.schedule(schedule_info) if schedule_info is not None else None
-
+    # Find the smallest cost mapping configuration.
     opt_result = cm.optimizer.opt_optimizer(resource, layer, schedule)
-    if verbose:
-        tabulate_mapping_config(opt_result[1])
-
+    # Memory accesses (inputs, outputs, weights, parallel: neighborhood PE) per level.
     level_costs = cm.cost_model.get_level_costs(resource, opt_result[1], layer, verbose)
 
     if verbose or basic:
-        print("best energy: ", opt_result[0])
-        print("cost for each level: ", level_costs)  # TODO
-        print("best schedule: ", cm.utils.print_loop_nest(opt_result[1]))
+        print_output("mapping configuration", tabulate_mapping_config(opt_result[1]))
+        print_output("cost for each level", tabulate_energy_costs(resource.para_index, level_costs))
+        print_output("best schedule", cm.utils.print_loop_nest(opt_result[1]))
     return opt_result[0]
 
 
@@ -165,4 +212,4 @@ if __name__ == "__main__":
     elif args.type == "dataflow_explore":
         dataflow_explore_optimizer(arch_info, network_info, args.name, args.verbose)
     end = time.time()
-    print("elapsed time: ", (end - start))
+    print("\nelapsed time: ", (end - start))
