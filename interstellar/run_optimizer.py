@@ -130,8 +130,8 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
     assert "explore_points" in arch_info, "missing explore_points in arch file"
     assert "capacity_scale" in arch_info, "missing capacity_scale in arch file"
     assert "access_cost_scale" in arch_info, "missing access_cost_scale in arch file"
-    cwd = os.getcwd()
-    #    output_filename = os.path.join(cwd, "dataset", network_info['layer_name'] + '_128.csv')
+    # cwd = os.getcwd()
+    # output_filename = os.path.join(cwd, "dataset", network_info['layer_name'] + '_128.csv')
     explore_points = arch_info["explore_points"]
     energy_list = np.zeros(tuple(explore_points))
     summary_array = np.zeros([np.product(explore_points), 12])
@@ -154,28 +154,11 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
             energy_list[x][y] = energy
             cur_point = network_info["layer_info"] + arch_info["capacity"][:-1] + [energy]
             summary_array[i] = cur_point
-            #            np.savetxt(output_filename, summary_array, delimiter=",")
+            # np.savetxt(output_filename, summary_array, delimiter=",")
             i += 1
 
     print(list(energy_list))
-    print("optiaml energy for all memory systems: ", np.min(np.array(energy_list)))
-
-
-'''
-def mac_explore_optimizer(arch_info, network_info, schedule_info, verbose=False):
-    dataflow_res = []
-    # TODO check the case when parallel count larger than layer dimension size
-    dataflow_generator = dataflow_generator_function(arch_info)
-
-    for dataflow in dataflow_generator:
-        energy = basic_optimizer(arch_info, network_info, schedule_info, False, verbose)
-        dataflow_res.append[energy]
-
-    if verbose:
-        print("optimal energy for all dataflows: ", dataflow_res)
-
-    return dataflow_res
-'''
+    print("optimal energy for all memory systems: ", np.min(np.array(energy_list)))
 
 
 def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False):
@@ -189,6 +172,8 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     if verbose:
         print("dataflow table done ")
 
+    return dataflow_tb
+
 
 # -v -s ./samples/schedule/eyeriss_alex_conv3.json basic ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
 # -v -s ./samples/schedule/eyeriss_alex_conv3.json mem_explore ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
@@ -200,16 +185,16 @@ if __name__ == "__main__":
     parser.add_argument("network", help="network specification")
     parser.add_argument("-s", "--schedule", help="restriction of the schedule space")
     parser.add_argument("-n", "--name", default="dataflow_table", help="name for the dumped pickle file")
-    parser.add_argument("-v", "--verbose", action='count', help="vebosity")
+    parser.add_argument("-v", "--verbose", action='count', help="verbosity")
     args = parser.parse_args()
 
     start = time.time()
-    arch_info, network_info, schedule_info = cm.extract_input.extract_info(args)
+    i_arch_info, i_network_info, i_schedule_info = cm.extract_input.extract_info(args)
     if args.type == "basic":
-        basic_optimizer(arch_info, network_info, schedule_info, True, args.verbose)
+        basic_optimizer(i_arch_info, i_network_info, i_schedule_info, True, args.verbose)
     elif args.type == "mem_explore":
-        mem_explore_optimizer(arch_info, network_info, schedule_info, args.verbose)
+        mem_explore_optimizer(i_arch_info, i_network_info, i_schedule_info, args.verbose)
     elif args.type == "dataflow_explore":
-        dataflow_explore_optimizer(arch_info, network_info, args.name, args.verbose)
+        dataflow_explore_optimizer(i_arch_info, i_network_info, args.name, args.verbose)
     end = time.time()
     print("\nelapsed time: ", (end - start))
