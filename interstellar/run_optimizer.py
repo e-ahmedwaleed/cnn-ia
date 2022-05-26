@@ -22,13 +22,20 @@ def generate_field_row_format(field_function):
         if _max < max(field_function(i)):
             _max = max(field_function(i))
 
-    column_width = max(len(str(_max)) + STANDARD_WIDTH / 2, STANDARD_WIDTH)
+    column_width = max(len(str(int(_max))) + STANDARD_WIDTH / 2, STANDARD_WIDTH)
 
     row_format = '\t'
     for j in range(table_width):
         row_format += "%-" + str(int(column_width)) + "s "
 
     return row_format + '%s'
+
+
+def to_ints(floats_tuple):
+    ints_list = []
+    for n in floats_tuple:
+        ints_list.append(int(n))
+    return tuple(ints_list)
 
 
 def mapping_config_field(title, field_function):
@@ -46,7 +53,7 @@ def mapping_config_field(title, field_function):
 
     for i in range(table_height):
         row = le.table[i] + ':'
-        table += (row_format % (row, *field_function(i))) + '\n'
+        table += (row_format % (row, *to_ints(field_function(i)))) + '\n'
 
     return table
 
@@ -90,20 +97,54 @@ def tabulate_energy_costs(para_index, level_costs):
     table += (row_format % tuple(header)) + '\n'
 
     row = 'ENERGY:'
-    table += (row_format % (row, *level_costs, sum(level_costs))) + " (pJ)"
+    table += (row_format % (row, *level_costs, sum(level_costs)))
 
     return table
 
 
-def print_output(title, content):
+def schedule_details(loop):
+    return "for ( " + loop[0] + ", " + str(int(loop[1])) + "b" + ", " + str(int(loop[2])) + "p )"
+
+
+def identify_loops(loops):
+    s = ''
+    for loop in loops:
+        s += str(le.table[loop[0]]) + ', '
+    return s[:-2]
+
+
+def tabulate_loop_blocking(loop_nest):
+    table_width = len(loop_nest[0])
+
+    table = ''
+
+    for i in range(table_width):
+        i = table_width - i - 1
+        taps = '\t'
+        table += taps + "MEM - L" + str(i) + ":" + '\n'
+        loop_nest[0][i].reverse()
+        for loop in loop_nest[0][i]:
+            if loop:
+                taps += '\t'
+                table += taps + schedule_details(loop) + '\n'
+        if loop_nest[1][i]:
+            table += "\n\t\tspatially unrolled loops: " + identify_loops(loop_nest[1][i]) + '\n'
+
+    return table
+
+
+def print_output(title, content, note=''):
     length = len(title) + 2
-    top = '┌'
-    bot = ' │\n└'
+    top = "┌"
+    if note:
+        bot = " │ [" + note + "]\n└"
+    else:
+        bot = " │\n└"
     for i in range(length):
-        top += '─'
-        bot += '─'
-    top += '┐\n│ '
-    bot += '┘\n'
+        top += "─"
+        bot += "─"
+    top += "┐\n│ "
+    bot += "┘\n"
     print(top + title + bot + str(content))
 
 
@@ -120,9 +161,10 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, basic=False, ve
     level_costs = cm.cost_model.get_level_costs(resource, opt_result[1], layer, verbose)
 
     if verbose or basic:
-        print_output("mapping configuration", tabulate_mapping_config(opt_result[1]))
-        print_output("cost for each level", tabulate_energy_costs(resource.para_index, level_costs))
-        print_output("best schedule", cm.utils.print_loop_nest(opt_result[1]))
+        print_output("MAPPING CONFIGURATION", tabulate_mapping_config(opt_result[1]))
+        print_output("COST FOR EACH LEVEL", tabulate_energy_costs(resource.para_index, level_costs), "measured in pJ")
+        print_output("BEST SCHEDULE", tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
+                     "b: blocking factor, p: partitioning unit")
     return opt_result[0]
 
 
@@ -175,7 +217,6 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     return dataflow_tb
 
 
-# -v -s ./samples/schedule/eyeriss_alex_conv3.json basic ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
 # -v -s ./samples/schedule/eyeriss_alex_conv3.json mem_explore ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
 # -v -s ./samples/schedule/eyeriss_alex_conv3.json dataflow_explore ./samples/arch/3_level_mem_explore.json ./samples/layer/mlp_fc3_batch16.json
 if __name__ == "__main__":
@@ -197,4 +238,4 @@ if __name__ == "__main__":
     elif args.type == "dataflow_explore":
         dataflow_explore_optimizer(i_arch_info, i_network_info, args.name, args.verbose)
     end = time.time()
-    print("\nelapsed time: ", (end - start))
+    print("elapsed time: ", (end - start))
