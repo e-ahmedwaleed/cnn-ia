@@ -16,7 +16,7 @@ def run_python(_py_file):
     subprocess.run(("python " + _py_file).split())
 
 
-_py_dir = file_dir + "/test-correctness/"
+_py_dir = file_dir + "/test_correctness/"
 
 py_files = []
 for file in list_files(_py_dir):
