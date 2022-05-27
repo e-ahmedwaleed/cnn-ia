@@ -25,6 +25,8 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, basic=False, ve
     opt_result = cm.optimizer.opt_optimizer(resource, layer, schedule)
     # Memory accesses (inputs, outputs, weights, parallel: neighborhood PE) per level.
     level_costs = cm.cost_model.get_level_costs(resource, opt_result[1], layer, verbose)
+    # Ratio of used PE units to total parallelism in parallel-enabled memory levels.
+    utilization = lb_utils.calculate_partitioning_utilization(opt_result[1], resource)
 
     if verbose or basic:
         print_output("MAPPING CONFIGURATION", lb_utils.tabulate_mapping_config(opt_result[1]))
@@ -32,24 +34,33 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, basic=False, ve
                      "measured in pJ")
         print_output("BEST SCHEDULE", lb_utils.tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
                      "b: blocking factor, p: partitioning unit")
-        print_output("UTILIZATIONS", "", lb_utils.calculate_partitioning_utilization(opt_result[1], resource))
+        print_output("UTILIZATIONS", "", str(utilization * 100) + "%")
     return opt_result[0]
+
+
+# TODO support more than two levels of explorations
+NUMBER_OF_SUPPORTED_EXPLORATIONS = 2
 
 
 def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False):
     assert "explore_points" in arch_info, "missing explore_points in arch file"
     assert "capacity_scale" in arch_info, "missing capacity_scale in arch file"
     assert "access_cost_scale" in arch_info, "missing access_cost_scale in arch file"
-    # cwd = os.getcwd()
-    # output_filename = os.path.join(cwd, "dataset", network_info['layer_name'] + '_128.csv')
+
+    cwd = os.getcwd()
+    output_filename = os.path.join(cwd, "dataset", network_info['layer_name'] + '_128.csv')
+    
     explore_points = arch_info["explore_points"]
     energy_list = np.zeros(tuple(explore_points))
-    summary_array = np.zeros([np.product(explore_points), 12])
-    # TODO support more than two levels of explorations
+
+    columns = len(arch_info["capacity"][0:NUMBER_OF_SUPPORTED_EXPLORATIONS]) + 1
+    summary_array = np.zeros([np.product(explore_points), columns])
+
     capacity0 = arch_info["capacity"][0]
     capacity1 = arch_info["capacity"][1]
     cost0 = arch_info["access_cost"][0]
     cost1 = arch_info["access_cost"][1]
+
     i = 0
     for x in range(explore_points[0]):
         arch_info["capacity"][0] = capacity0 * (arch_info["capacity_scale"][0] ** x)
@@ -60,16 +71,17 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
             arch_info["capacity"][1] = capacity1 * (arch_info["capacity_scale"][1] ** y)
             arch_info["access_cost"][1] = cost1 * (arch_info["access_cost_scale"][1] ** y)
             print(arch_info)
-            # Ahmed - TODO: turn on verbose again
-            energy = basic_optimizer(arch_info, network_info, schedule_info, False, False)  # ,verbose)
+            energy = basic_optimizer(arch_info, network_info, schedule_info)
             energy_list[x][y] = energy
-            cur_point = network_info["layer_info"] + arch_info["capacity"][:-1] + [energy]
+            cur_point = arch_info["capacity"][0:NUMBER_OF_SUPPORTED_EXPLORATIONS] + [energy]
             summary_array[i] = cur_point
-            # np.savetxt(output_filename, summary_array, delimiter=",")
+            # noinspection PyTypeChecker
+            np.savetxt(output_filename, summary_array, delimiter=",")
             i += 1
 
-    print(list(energy_list))
-    print("optimal energy for all memory systems: ", np.min(np.array(energy_list)))
+    if verbose:
+        print(list(energy_list))
+        print("optimal energy for all memory systems: ", np.min(np.array(energy_list)))
 
 
 def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False):

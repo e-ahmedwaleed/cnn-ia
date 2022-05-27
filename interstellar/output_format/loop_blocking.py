@@ -115,6 +115,5 @@ def calculate_partitioning_utilization(mapping_configuration, resource):
         mapping_configuration.loop_partitionings,
         resource.para_index,
         mapping_configuration.para_loop_dim)
-    utilization = cm.mapping_point_generator.get_utilization(utilized, resource)
 
-    return str(utilization * 100) + "%"
+    return cm.mapping_point_generator.get_utilization(utilized, resource)
