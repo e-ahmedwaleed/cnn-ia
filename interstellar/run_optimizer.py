@@ -63,8 +63,14 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
         for x in range(explore_points[0]):
             arch_info["capacity"][0] = capacity0 * (arch_info["capacity_scale"][0] ** x)
             arch_info["access_cost"][0] = cost0 * (arch_info["access_cost_scale"][0] ** x)
-            energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
-            exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [energy]
+            try:
+                energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
+                exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [energy]
+            except AssertionError as err:
+                if err.args[0] == "No valid mapping point found.":
+                    exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [float("inf")]
+                else:
+                    raise
             i += 1
 
     if verbose:
