@@ -5,5 +5,5 @@ output/
 CNN-*
 *__pycache__
 
-run*
-*.txt
+run.sh
+*.pickle
