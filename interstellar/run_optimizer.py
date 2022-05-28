@@ -22,11 +22,11 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
     layer = cm.Layer.layer(network_info)
     # Schedule hint specification
     schedule = cm.Schedule.schedule(schedule_info) if schedule_info is not None else None
-    # Find the smallest cost mapping configuration.
+    # Find the smallest cost mapping configuration
     opt_result = cm.optimizer.opt_optimizer(resource, layer, schedule)
 
     if verbose:
-        # Memory accesses (inputs, outputs, weights, parallel: neighborhood PE) per level.
+        # Memory accesses (inputs, outputs, weights, parallel: neighborhood PE) per level
         level_costs = cm.cost_model.get_level_costs(resource, opt_result[1], layer, verbose)
 
         print_output("MAPPING CONFIGURATION", lb_utils.tabulate_mapping_config(opt_result[1]))
@@ -43,32 +43,32 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
     assert "capacity_scale" in arch_info, "missing capacity_scale in arch file"
     assert "access_cost_scale" in arch_info, "missing access_cost_scale in arch file"
 
+    # Memory exploration dimensions
     explore_points = arch_info["explore_points"]
-
+    # Number of memory levels * 2 + cost column
     columns = len(arch_info["capacity"]) * 2 + 1
+    # Initialize exploration table
     exploration_tb = np.zeros([np.product(explore_points), columns])
 
     # TODO support more than two levels of explorations
-    capacity0 = arch_info["capacity"][0]
     capacity1 = arch_info["capacity"][1]
-    cost0 = arch_info["access_cost"][0]
+    capacity0 = arch_info["capacity"][0]
     cost1 = arch_info["access_cost"][1]
+    cost0 = arch_info["access_cost"][0]
 
     i = 0
-    for x in range(explore_points[0]):
-        arch_info["capacity"][0] = capacity0 * (arch_info["capacity_scale"][0] ** x)
-        arch_info["access_cost"][0] = cost0 * (arch_info["access_cost_scale"][0] ** x)
-        for y in range(explore_points[1]):
-            arch_info["capacity"][1] = capacity1 * (arch_info["capacity_scale"][1] ** y)
-            arch_info["access_cost"][1] = cost1 * (arch_info["access_cost_scale"][1] ** y)
+    for y in range(explore_points[1]):
+        arch_info["capacity"][1] = capacity1 * (arch_info["capacity_scale"][1] ** y)
+        arch_info["access_cost"][1] = cost1 * (arch_info["access_cost_scale"][1] ** y)
+        for x in range(explore_points[0]):
+            arch_info["capacity"][0] = capacity0 * (arch_info["capacity_scale"][0] ** x)
+            arch_info["access_cost"][0] = cost0 * (arch_info["access_cost_scale"][0] ** x)
             energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
-            print("capacity: " + str(arch_info["capacity"]) + ", access_cost: " + str(
-                arch_info["access_cost"]) + ", energy: " + str(energy))
-            cur_point = arch_info["capacity"] + arch_info["access_cost"] + [energy]
-            exploration_tb[i] = cur_point
+            exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [energy]
             i += 1
 
     if verbose:
+        print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
         content, note = me_utils.tabulate_optimal_arch(exploration_tb)
         print_output("OPTIMAL COST", content, note)
 
