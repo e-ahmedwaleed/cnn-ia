@@ -82,7 +82,9 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
 
 
 def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False):
-    # Ahmed - TODO: compare and fix other assertions
+    # TODO: compare and fix other assertions
+    # Many dataflow explorations failed because of the wrong assertion from before
+    # assert arch_info["parallel_count"][0] > 1, \
     assert any(n > 1 for n in arch_info["parallel_count"]), \
         "parallel count has to be more than 1 for dataflow exploration"
 
