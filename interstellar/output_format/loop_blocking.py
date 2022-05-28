@@ -81,7 +81,15 @@ def tabulate_energy_costs(para_index, level_costs):
     table += (row_format % tuple(header)) + '\n'
 
     row = 'ENERGY:'
-    table += (row_format % (row, *level_costs, sum(level_costs)))
+    # last memory level is not checked for invalid_underutilized,
+    # memory_partitions[-1] = [None]s leading to level_costs[-1] = 0
+    costs = []
+    for cost in level_costs:
+        if cost:
+            costs.append(cost)
+        else:
+            costs.append("NOT_CHECKED")
+    table += (row_format % (row, *costs, sum(level_costs)))
 
     return table
 
