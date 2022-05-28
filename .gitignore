@@ -1,6 +1,6 @@
 .*
 venv/
-data*/
+data/
 output/
 CNN-*
 *__pycache__

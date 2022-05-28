@@ -8,7 +8,7 @@ def print_tabulated_dataflow_results(dataflow_tb):
     for unrollment in sorted(dataflow_tb):
         title = identify_loops_in_brackets_str(unrollment)
         content = tabulate_mapping_config(dataflow_tb[unrollment][2])
-        note = "cost: " + str(dataflow_tb[unrollment][0]) + " pJ, util: " \
+        note = "cost: " + str(dataflow_tb[unrollment][0]) + " pJ, utilization: " \
                + str(dataflow_tb[unrollment][1] * 100) + "%"
         print_output(title, content, note)
 
@@ -24,7 +24,7 @@ def print_tabulated_best_schedules(dataflow_tb):
         else:
             best_cost = best_util = unrollment
 
-    print_output("BEST COST", tabulate_loop_blocking(cm.utils.print_loop_nest(dataflow_tb[best_cost][2])),
+    print_output("OPTIMAL COST", tabulate_loop_blocking(cm.utils.print_loop_nest(dataflow_tb[best_cost][2])),
                  "b: blocking factor, p: partitioning unit")
-    print_output("BEST UTILIZATION", tabulate_loop_blocking(cm.utils.print_loop_nest(dataflow_tb[best_util][2])),
+    print_output("OPTIMAL UTILIZATION", tabulate_loop_blocking(cm.utils.print_loop_nest(dataflow_tb[best_util][2])),
                  "b: blocking factor, p: partitioning unit")

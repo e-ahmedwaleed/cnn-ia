@@ -108,12 +108,3 @@ def tabulate_loop_blocking(loop_nest):
             table += "\n\t\tspatially unrolled loops: " + identify_loops_in_list_of_lists(loop_nest[1][i]) + '\n'
 
     return table[:-1] if table[-1] == '\n' else table
-
-
-def calculate_partitioning_utilization(mapping_configuration, resource):
-    unrolled_loops, utilized = cm.mapping_point_generator.partitioned_loop_string(
-        mapping_configuration.loop_partitionings,
-        resource.para_index,
-        mapping_configuration.para_loop_dim)
-
-    return cm.mapping_point_generator.get_utilization(utilized, resource)
