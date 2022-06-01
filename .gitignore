@@ -1,9 +1,11 @@
 .*
 venv/
 data/
-output/
-CNN-*
 *__pycache__
 
-run.sh
-*.pickle
+CNN-*
+*pickle
+output/
+*_output/
+
+*run.sh
