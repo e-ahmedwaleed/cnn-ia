@@ -23,7 +23,11 @@ def print_tabulated_best_schedules(loop_nest, dataflow_tb):
         else:
             best_cost = best_util = unrollment
 
-    utils.print_output("OPTIMAL COST", tabulate_loop_blocking(loop_nest(dataflow_tb[best_cost][2])),
-                       "b: blocking factor, p: partitioning unit")
-    utils.print_output("OPTIMAL UTILIZATION", tabulate_loop_blocking(loop_nest(dataflow_tb[best_util][2])),
-                       "b: blocking factor, p: partitioning unit")
+    if best_cost != best_util:
+        utils.print_output("OPTIMAL COST", tabulate_loop_blocking(loop_nest(dataflow_tb[best_cost][2])),
+                           "b: blocking factor, p: partitioning unit")
+        utils.print_output("OPTIMAL UTILIZATION", tabulate_loop_blocking(loop_nest(dataflow_tb[best_util][2])),
+                           "b: blocking factor, p: partitioning unit")
+    else:
+        utils.print_output("OPTIMAL SCHEDULE", tabulate_loop_blocking(loop_nest(dataflow_tb[best_util][2])),
+                           "b: blocking factor, p: partitioning unit")

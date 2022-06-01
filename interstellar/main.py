@@ -50,26 +50,26 @@ def run_python(_py_file, _stdout=None, _stderr=True, _timeout=None):
             timeout_dir = timeouts_dir + "/" + str(_timeout) + " secs"
             create_dir(timeout_dir)
             _stdout = timeout_dir + "/" + name_of(_stdout)
-            file = open(_stdout.replace(".txt", ".timeout"), "w")
+            file = open(_stdout.replace(".txt", ".timeout"), "w", encoding='utf-8')
             file.write("timeout... " + str(_timeout) + " sec(s)")
             file.close()
         return
 
     if _stdout:
         if proc.returncode == 0:
-            file = open(_stdout, "w")
-            file.write(proc.stdout.decode('ascii'))
+            file = open(_stdout, "w", encoding='utf-8')
+            file.write(proc.stdout.decode('utf-8').replace("\r\n", "\n"))
         else:
             exceptions_dir = insert_instead(_stdout, "exceptions")
             create_dir(exceptions_dir)
-            exception_dir = exceptions_dir + "/" + msg_of(proc.stderr.decode('ascii'))
+            exception_dir = exceptions_dir + "/" + msg_of(proc.stderr.decode('utf-8'))
             create_dir(exception_dir)
             _stdout = exception_dir + "/" + name_of(_stdout)
-            file = open(_stdout.replace(".txt", ".exception"), "w")
-            file.write(proc.stderr.decode('ascii'))
+            file = open(_stdout.replace(".txt", ".exception"), "w", encoding='utf-8')
+            file.write(proc.stderr.decode('utf-8').replace("\r\n", "\n"))
         file.close()
     elif _stderr:
-        print(proc.stderr.decode('ascii'))
+        print(proc.stderr.decode('utf-8'))
 
     return proc
 
