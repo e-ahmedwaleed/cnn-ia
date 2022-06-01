@@ -1,6 +1,6 @@
 import numpy as np
 
-from interstellar.output_format.loop_blocking import generate_cost_row_format
+from output_format.loop_blocking import generate_cost_row_format
 
 
 def identify_exploration_table_row(exploration_tb, index):

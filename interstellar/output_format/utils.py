@@ -1,5 +1,4 @@
-import interstellar.cnn_mapping.loop_enum as le
-
+enum_table = {}
 STANDARD_WIDTH = 12
 
 
@@ -13,7 +12,7 @@ def to_ints(floats_tuple):
 def identify_loops_in_list_of_lists(list_of_loops):
     s = ''
     for list_of_loop in list_of_loops:
-        s += str(le.table[list_of_loop[0]]) + ', '
+        s += str(enum_table[list_of_loop[0]]) + ', '
     return s[:-2]
 
 
@@ -24,7 +23,7 @@ def find_occurrences(string, char):
 def identify_loops_in_brackets_str(str_of_loops):
     s = ''
     for i in find_occurrences(str_of_loops, '('):
-        s += str(le.table[int(str_of_loops[i + 1])]) + ', '
+        s += str(enum_table[int(str_of_loops[i + 1])]) + ', '
     return s[:-2]
 
 

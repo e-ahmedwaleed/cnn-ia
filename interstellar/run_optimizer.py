@@ -1,9 +1,3 @@
-import os
-import sys
-
-file_dir = os.path.dirname(__file__)
-sys.path.append(file_dir)
-
 import time
 import argparse
 import numpy as np
@@ -12,7 +6,9 @@ import output_format.dataflow as df_utils
 import output_format.loop_blocking as lb_utils
 import output_format.memory_explore as me_utils
 
-from output_format.utils import print_output
+import output_format.utils as utils
+
+utils.enum_table = cm.loop_enum.table
 
 
 def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
@@ -29,11 +25,11 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
         # Memory accesses (inputs, outputs, weights, parallel: neighborhood PE) per level
         level_costs = cm.cost_model.get_level_costs(resource, opt_result[1], layer, verbose)
 
-        print_output("MAPPING CONFIGURATION", lb_utils.tabulate_mapping_config(opt_result[1]))
-        print_output("COST FOR EACH LEVEL", lb_utils.tabulate_energy_costs(resource.para_index, level_costs),
-                     "measured in pJ")
-        print_output("SCHEDULE", lb_utils.tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
-                     "b: blocking factor, p: partitioning unit")
+        utils.print_output("MAPPING CONFIGURATION", lb_utils.tabulate_mapping_config(opt_result[1]))
+        utils.print_output("COST FOR EACH LEVEL", lb_utils.tabulate_energy_costs(resource.para_index, level_costs),
+                           "measured in pJ")
+        utils.print_output("SCHEDULE", lb_utils.tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
+                           "b: blocking factor, p: partitioning unit")
 
     return opt_result
 
@@ -74,9 +70,9 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
             i += 1
 
     if verbose:
-        print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
+        utils.print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
         content, note = me_utils.tabulate_optimal_arch(exploration_tb)
-        print_output("OPTIMAL COST", content, note)
+        utils.print_output("OPTIMAL COST", content, note)
 
     return exploration_tb
 
@@ -97,7 +93,7 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
 
     if verbose:
         df_utils.print_tabulated_dataflow_results(dataflow_tb)
-        df_utils.print_tabulated_best_schedules(dataflow_tb)
+        df_utils.print_tabulated_best_schedules(cm.utils.print_loop_nest, dataflow_tb)
 
     return dataflow_tb
 
@@ -121,4 +117,4 @@ if __name__ == "__main__":
     elif args.type == "dataflow_explore":
         dataflow_explore_optimizer(i_arch_info, i_network_info, args.name, args.verbose)
     end = time.time()
-    print_output("ELAPSED TIME", "", str(end - start) + " sec")
+    utils.print_output("ELAPSED TIME", "", str(end - start) + " sec")

@@ -1,11 +1,10 @@
-import interstellar.cnn_mapping as cm
-import interstellar.cnn_mapping.loop_enum as le
+import output_format.utils as utils
 
-from output_format.utils import STANDARD_WIDTH, to_ints, identify_loops_in_list_of_lists
+from output_format.utils import STANDARD_WIDTH
 
 
 def generate_field_row_format(field_function):
-    table_height = le.NUM
+    table_height = len(utils.enum_table)
     table_width = len(field_function(0))
 
     _max = -1
@@ -23,7 +22,7 @@ def generate_field_row_format(field_function):
 
 
 def mapping_config_field(title, field_function):
-    table_height = le.NUM
+    table_height = len(utils.enum_table)
     table_width = len(field_function(0))
 
     table = '  ' + title + '\n'
@@ -36,8 +35,8 @@ def mapping_config_field(title, field_function):
     table += (row_format % tuple(header)) + '\n'
 
     for i in range(table_height):
-        row = le.table[i] + ':'
-        table += (row_format % (row, *to_ints(field_function(i)))) + '\n'
+        row = utils.enum_table[i] + ':'
+        table += (row_format % (row, *utils.to_ints(field_function(i)))) + '\n'
 
     return table
 
@@ -113,6 +112,6 @@ def tabulate_loop_blocking(loop_nest):
                 taps += '\t'
                 table += taps + schedule_details(loop) + '\n'
         if loop_nest[1][i]:
-            table += "\n\t\tspatially unrolled loops: " + identify_loops_in_list_of_lists(loop_nest[1][i]) + '\n'
+            table += "\n\t\tspatially unrolled loops: " + utils.identify_loops_in_list_of_lists(loop_nest[1][i]) + '\n'
 
     return table[:-1] if table[-1] == '\n' else table

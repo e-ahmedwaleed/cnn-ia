@@ -1,10 +1,8 @@
 import os
-import sys
 import threading
 import subprocess
 
 file_dir = os.path.dirname(__file__)
-sys.path.append(file_dir)
 
 
 def list_files(_dir):
