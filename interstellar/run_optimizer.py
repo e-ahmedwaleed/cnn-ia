@@ -1,12 +1,12 @@
 import time
 import argparse
 import numpy as np
-import cnn_mapping as cm
-import output_format.dataflow as df_utils
-import output_format.loop_blocking as lb_utils
-import output_format.memory_explore as me_utils
+import mapping as cm
+import verbose.dataflow as df_utils
+import verbose.loop_blocking as lb_utils
+import verbose.memory_explore as me_utils
 
-import output_format.utils as utils
+import verbose.utils as utils
 
 utils.enum_table = cm.loop_enum.table
 
