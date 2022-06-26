@@ -1,7 +1,7 @@
 import threading
 
 from cli.utils import create_dir, list_files, name_of
-from cli.testing import run_python
+from cli.test import run_python
 
 
 def list_samples(_type):
@@ -15,10 +15,10 @@ def list_samples(_type):
 
 # noinspection SpellCheckingInspection
 def run_dataflow_samples(_timeout):
+    _optimizer_type = "dataflow_explore"
+
     layers = list_samples("layer")
     archs = list_samples("arch")
-
-    _optimizer_type = "dataflow_explore"
 
     output_dir = "interstellar-output"
     create_dir(output_dir)

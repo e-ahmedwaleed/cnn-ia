@@ -28,6 +28,12 @@ def list_files(_dir):
     return files
 
 
+# dir_path/ -> ['dir0', 'dir1', ...]
+def list_dirs(_dir):
+    (_, dirs, _) = next(os.walk(_dir))
+    return dirs
+
+
 # file_path/file_name.txt & _dir_name -> file_path/_dir_name
 def insert_instead(_file, _dir):
     return _file[0:_file.rfind("/")] + "/" + _dir
