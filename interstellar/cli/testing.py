@@ -54,7 +54,7 @@ def run_pythons(_py_dir):
 
     threads = []
     for py_file in py_files:
-        t = threading.Thread(target=run_python, args=(_py_dir + py_file,))
+        t = threading.Thread(target=run_python, args=(_py_dir + py_file,), daemon=True)
         threads.append(t)
         t.start()
 

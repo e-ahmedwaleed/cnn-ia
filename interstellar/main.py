@@ -1,6 +1,6 @@
 from cli.utils import read_int
 from cli.testing import run_pythons
-from cli.sampling import run_interstellar_samples
+from cli.sampling import run_dataflow_samples
 
 if __name__ == "__main__":
     print("\nAvailable options:")
@@ -17,4 +17,4 @@ if __name__ == "__main__":
         run_pythons("correctness/")
     elif choice == 2:
         timeout = read_int("Set time limit (in-secs): ", 0)
-        run_interstellar_samples("dataflow_explore", timeout)
+        run_dataflow_samples(timeout)

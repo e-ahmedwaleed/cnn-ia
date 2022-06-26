@@ -14,20 +14,17 @@ def list_samples(_type):
 
 
 # noinspection SpellCheckingInspection
-def run_interstellar_samples(_optimizer_type, _timeout):
+def run_dataflow_samples(_timeout):
     layers = list_samples("layer")
     archs = list_samples("arch")
-    schedules = list_samples("schedule")
+
+    _optimizer_type = "dataflow_explore"
 
     output_dir = "interstellar-output"
     create_dir(output_dir)
 
     optimizer_dir = output_dir + "/"
-    if _optimizer_type == "basic":
-        optimizer_dir += "loop-blocking"
-    else:
-        optimizer_dir += "dataflow"
-
+    optimizer_dir += "dataflow"
     optimizer_dir += '-' + str(_timeout)
     create_dir(optimizer_dir)
 
@@ -37,27 +34,13 @@ def run_interstellar_samples(_optimizer_type, _timeout):
         threads = []
         for arch in archs:
             arch_dir = layer_dir + "/" + name_of(arch)
-            if _optimizer_type == "dataflow_explore":
-                cmd = "./run_optimizer.py -v dataflow_explore " + arch + " " + layer
-                output = arch_dir + ".txt"
 
-                t = threading.Thread(target=run_python, args=(cmd, output, False, _timeout,))
-                threads.append(t)
-                t.start()
-            else:
-                threads = []
-                create_dir(arch_dir)
-                for schedule in schedules:
-                    schedule_file = arch_dir + "/" + name_of(schedule)
-                    cmd = "./run_optimizer.py -v -s " + schedule + " " + _optimizer_type + " " + arch + " " + layer
-                    output = schedule_file + ".txt"
+            cmd = "./run_optimizer.py -v dataflow_explore " + arch + " " + layer
+            output = arch_dir + ".txt"
 
-                    t = threading.Thread(target=run_python, args=(cmd, output, False, _timeout,))
-                    threads.append(t)
-                    t.start()
-
-                for schedule_thread in threads:
-                    schedule_thread.join()
+            t = threading.Thread(target=run_python, args=(cmd, output, False, _timeout,), daemon=True)
+            threads.append(t)
+            t.start()
 
         for arch_thread in threads:
             arch_thread.join()
