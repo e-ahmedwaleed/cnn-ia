@@ -1,9 +1,10 @@
 .*
 venv/
 data/
-output/
-CNN-*
 *__pycache__
 
-run.sh
-*.pickle
+CNN-*
+output/
+*interstellar-*
+
+*run.sh
