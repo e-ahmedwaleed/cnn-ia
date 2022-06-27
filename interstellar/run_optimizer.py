@@ -32,7 +32,9 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
                            "b: blocking factor, p: partitioning unit")
         report.generate_basic(opt_result[1],
                               level_costs, resource.para_index,
-                              cm.utils.print_loop_nest(opt_result[1]))
+                              cm.utils.print_loop_nest(opt_result[1]),
+                              i_arch_info, i_network_info, i_schedule_info)
+
     return opt_result
 
 
