@@ -5,7 +5,7 @@ import mapping as cm
 import verbose.dataflow as df_utils
 import verbose.loop_blocking as lb_utils
 import verbose.memory_explore as me_utils
-
+import report_generation.basic_report as report
 import verbose.utils as utils
 
 utils.enum_table = cm.loop_enum.table
@@ -30,7 +30,9 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
                            "measured in pJ")
         utils.print_output("SCHEDULE", lb_utils.tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
                            "b: blocking factor, p: partitioning unit")
-
+        report.generate_basic(opt_result[1],
+                              level_costs, resource.para_index,
+                              cm.utils.print_loop_nest(opt_result[1]))
     return opt_result
 
 
