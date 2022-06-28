@@ -9,7 +9,7 @@ class PDF(FPDF):
     def header(self):
         self.set_font('Arial', 'B', c.h4)
         # project name at the left of header
-        self.cell(30, 10, 'CNN-EIA', 0, 0, 'L')
+        self.cell(30, 10, 'CNN-IA', 0, 0, 'L')
         # the current date
         self.cell(0, 10, str(date.today()), 0, 0, 'R')
         if self.page_no() != 1:
