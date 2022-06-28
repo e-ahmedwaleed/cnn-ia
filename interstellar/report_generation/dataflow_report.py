@@ -22,24 +22,25 @@ def print_tables(pdf, loop):
 
     # loop blocking
 
-    pdf.cell(50, 10, "Loop Blocking ( factors ): ", "B", 0, 'L')
+    pdf.cell(66, 10, "Loop Blocking (factors):", "B", 0, 'L')
     w.write_loops(loop[2].loop_blockings, pdf)
 
     # loop partitioning
     pdf.set_font('Arial', 'B', c.h1)
-    pdf.cell(50, 10, "Loop Partitioning ( units ): ", "B", 0, 'L')
+    pdf.cell(69, 10, "Loop Partitioning (units): ", "B", 0, 'L')
     w.write_loops(loop[2].loop_partitionings, pdf)
 
     # loop ordering
     pdf.set_font('Arial', 'B', c.h1)
-    pdf.cell(50, 10, "Loop Ordering (from the innermost): ", "B", 0, 'L')
+    pdf.cell(100, 10, "Loop Ordering (from the innermost): ", "B", 0, 'L')
     w.write_loops(loop[2].loop_orders, pdf)
 
 
-def write_optimalilty(pdf, loop_nest, dataflow_tb, title, best):
+def write_optimality(pdf, loop_nest, dataflow_tb, title, best, hint=False):
     pdf.cell(60, 10, title, 1, 0, 'C')
-    pdf.set_font('Arial', '', c.h4)
-    pdf.cell(70, 10, "[b: blocking factor, p: partitioning unit]")
+    if hint:
+        pdf.set_font('Arial', '', c.h4)
+        pdf.cell(70, 10, "[b: blocking factor, p: partitioning unit]")
     pdf.ln(c.inter_mid_new_line)
     w.write_schedule(loop_nest(dataflow_tb[best][2]), pdf)
     pdf.ln(c.small_new_line)
@@ -57,10 +58,10 @@ def write_best_cost_utilization(loop_nest, dataflow_tb, pdf):
             best_cost = best_util = unrollment
 
     if best_cost != best_util:
-        write_optimalilty(pdf, loop_nest, dataflow_tb, "Optimal cost", best_cost)
-        write_optimalilty(pdf, loop_nest, dataflow_tb, "Optimal utilization", best_util)
+        write_optimality(pdf, loop_nest, dataflow_tb, "Optimal cost", best_cost, True)
+        write_optimality(pdf, loop_nest, dataflow_tb, "Optimal utilization", best_util)
     else:
-        write_optimalilty(pdf, loop_nest, dataflow_tb, "Optimal schedule", best_util)
+        write_optimality(pdf, loop_nest, dataflow_tb, "Optimal schedule", best_util, True)
 
 
 def generate(loop_nest, dataflow_tb, arch_info, network_info):
