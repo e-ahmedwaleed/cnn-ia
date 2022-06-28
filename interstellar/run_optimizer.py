@@ -7,6 +7,7 @@ import verbose.loop_blocking as lb_utils
 import verbose.memory_explore as me_utils
 import report_generation.basic_report as basic_report
 import report_generation.dataflow_report as dataflow_report
+import report_generation.memory_report as memory_report
 import verbose.utils as utils
 
 utils.enum_table = cm.loop_enum.table
@@ -78,6 +79,7 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
         utils.print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
         content, note = me_utils.tabulate_optimal_arch(exploration_tb)
         utils.print_output("OPTIMAL COST", content, note)
+        memory_report.generate(exploration_tb, content, note, arch_info, network_info)
 
     return exploration_tb
 
