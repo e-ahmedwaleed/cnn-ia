@@ -25,7 +25,7 @@ large_new_line = 20
 
 """
 margins used  : 30 for width
-                  8 for height
+                8 for height
 """
 width_margin = 30
 height_margin = 8
@@ -47,13 +47,14 @@ def write_loops(values, pdf):
         pdf.cell(width_margin, height_margin, loops[block_index + 1], align='C')
         pdf.set_font('Arial', '', h4)  # for values
         for cell in block:
-            pdf.cell(width_margin, height_margin, str(cell), align='C')
+            pdf.cell(width_margin, height_margin, str(int(cell)), align='C')
         pdf.ln(small_new_line)
     pdf.ln(small_new_line)
     pdf.set_font('Arial', 'B', h1)  # reset
 
 
 def write_cost_levels(costs, para_index, pdf):
+    num_para = 0
     #  write first row headers
     pdf.set_font('Arial', 'B', h3)  # for headers
     pdf.cell(width_margin, height_margin, "MEM ", align='L')
@@ -62,11 +63,17 @@ def write_cost_levels(costs, para_index, pdf):
     pdf.set_font('Arial', '', h4)  # for headers
     for cell_index in range(0, len(costs) - 1):
         pdf.cell(width_margin, height_margin, "L" + str(cell_index), align='L')
-        pdf.cell(width_margin, height_margin, str(costs[cell_index]), align='L')
+        s = ""
+        if costs[cell_index+num_para] == 0:
+            s = "NOT_CHECKED"
+        else:
+            s = str(costs[cell_index+num_para])
+        pdf.cell(width_margin, height_margin, s, align='L')
         pdf.ln(small_new_line)
         if cell_index in para_index:
+            num_para = num_para+1
             pdf.cell(width_margin, height_margin, "L" + str(cell_index) + "-PARA", align='L')
-            pdf.cell(width_margin, height_margin, str(costs[cell_index]), align='L')
+            pdf.cell(width_margin, height_margin, str(costs[cell_index+num_para]), align='L')
             pdf.ln(small_new_line)
     pdf.cell(width_margin, height_margin, "TOTAL", align='L')
     pdf.cell(width_margin, height_margin, str(sum(costs)), align='L')
@@ -76,7 +83,7 @@ def write_cost_levels(costs, para_index, pdf):
 
 
 def write_schedule(schedules, pdf):
-    for schedule_index in range(0, len(schedules[0])):
+    for schedule_index in reversed(range(0, len(schedules[0]))):
         schedules[0][schedule_index].reverse()
         pdf.set_font('Arial', 'B', h4)  # row header
         pdf.cell(width_margin, height_margin, "MEM - L" + str(schedule_index) + ": ", align='L')
@@ -186,7 +193,6 @@ def input_shape(arch_info, network_info, schedule_info, pdf):
 
 
 def generate_basic(map_config, costs, para_index, schedules, arch_info, network_info, schedule_info):
-    print(arch_info)
     pdf = PDF()
     pdf.alias_nb_pages()
     pdf.add_page()
