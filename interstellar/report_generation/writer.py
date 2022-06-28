@@ -58,7 +58,7 @@ def write_cost_levels(costs, para_index, pdf):
     if s_checked == "NOT_CHECKED":
         pdf.set_font('Arial', 'B', c.h3)
         pdf.cell(c.width_margin, c.height_margin, "- L" + str(not_checked) +
-                 " memory was not checked for invalid underutilized.", align='L')
+                 " memory was not checked for invalid underutilization.", align='L')
 
     pdf.ln(c.large_new_line)
 
