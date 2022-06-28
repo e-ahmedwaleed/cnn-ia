@@ -45,17 +45,17 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
 
     # loop blocking
 
-    pdf.cell(50, 10, "Loop Blocking ( factors ): ", "B", 0, 'L')
+    pdf.cell(66, 10, "Loop Blocking (factors):", "B", 0, 'L')
     w.write_loops(map_config.loop_blockings, pdf, list(schedule_info.values())[0])
 
     # loop partitioning
     pdf.set_font('Arial', 'B', c.h1)
-    pdf.cell(50, 10, "Loop Partitioning ( units ): ", "B", 0, 'L')
+    pdf.cell(69, 10, "Loop Partitioning (units): ", "B", 0, 'L')
     w.write_loops(map_config.loop_partitionings, pdf, list(schedule_info.values())[0])
 
     # loop ordering
     pdf.set_font('Arial', 'B', c.h1)
-    pdf.cell(50, 10, "Loop Ordering (from the innermost): ", "B", 0, 'L')
+    pdf.cell(100, 10, "Loop Ordering (from the innermost): ", "B", 0, 'L')
     w.write_loops(map_config.loop_orders, pdf, list(schedule_info.values())[0])
     pdf.set_font('Arial', 'B', c.h4)
     pdf.set_text_color(0, 128, 0)

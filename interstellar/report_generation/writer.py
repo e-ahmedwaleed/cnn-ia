@@ -112,7 +112,7 @@ def glossary_element(arr, header, pdf):
 # glossary definitions
 def glossary(levels, pdf):
     pdf.set_font('Arial', 'B', c.h2)
-    pdf.cell(30, 10, "Glossary  : ", "B", 0, 'L')
+    pdf.cell(25, 10, "Glossary:", "B", 0, 'L')
     pdf.ln(c.meduim_new_line)
     cache_list = []
     for index in range(0, levels):
@@ -146,7 +146,7 @@ def convert_dash_names_to_capital_names(names):
     temp = []
     for name in names:
         name = name.replace('_', ' ')
-        name = name.capitalize()
+        name = name.capitalize().replace("mac", "MAC")
         temp.append(name)
     return temp
 
@@ -204,16 +204,15 @@ def write_key_value(keys, values, pdf, margin=60):
         pdf.set_font('Arial', 'B', c.h4)  # for headers
         pdf.cell(margin, 5, str(keys[key]), align="L")
         pdf.set_font('Arial', '', c.h4)  # for values
-        if margin == 60:
-            pdf.cell(25, 10)
-        pdf.cell(20, 5, " :     " + str(values[key]), align="L")
+
+        pdf.cell(20, 5, " :  " + str(values[key]), align="L")
         pdf.ln(c.inter_small_new_line)
 
 
 def to_mem_arch(arch, pdf):
     print(arch)
     pdf.set_font('Arial', 'B', c.h2)
-    pdf.cell(55, 10, "Memory Architecture  : ", "B", 1, 'L')
+    pdf.cell(52, 10, "Memory Architecture:", "B", 1, 'L')
     mem_list = {}
     status_list = {}
     # put parallel cost for specific parallel mode
@@ -246,6 +245,6 @@ def to_mem_arch(arch, pdf):
     make_table(rows_mem, list(mem_list.values()), pdf)
 
     # write status as a key : value
-    write_key_value(rows_status, list(status_list.values()), pdf)
+    write_key_value(rows_status, list(status_list.values()), pdf, 55)
     pdf.set_font('Arial', 'B', c.h1)
 
