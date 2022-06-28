@@ -85,7 +85,8 @@ def write_schedule(schedules, pdf, partitioning_loops=None):
         if schedules[1][schedule_index]:
             # write the unrolled loops
             loop_string = identify_loops_in_list_of_lists(schedules[1][schedule_index])
-            pdf.cell(c.width_margin + taps, c.height_margin, "spatially unrolled loops: " + loop_string + '\n',
+            pdf.cell(5, 10)
+            pdf.cell(c.width_margin, c.height_margin, "spatially unrolled loops: " + loop_string + '\n',
                      align='c')
             pdf.ln(c.small_new_line)
         pdf.ln(c.small_new_line)
