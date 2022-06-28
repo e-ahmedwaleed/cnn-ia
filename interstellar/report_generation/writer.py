@@ -115,19 +115,18 @@ def glossary_element(arr, header, pdf):
 
 # glossary definitions
 def glossary(levels, pdf):
-    loops = ["MEM", "FX", "FY", "OX", "OY", "OC", "IC", "ON"]  # write names of the seven loops
     pdf.set_font('Arial', 'B', c.h2)
     pdf.cell(0, 10, "Glossary  : ", 0, 0, 'L')
     pdf.ln(c.meduim_new_line)
     cache_list = []
-    for index in range(0, len(levels)):
+    for index in range(0, levels):
         cache_list.append("L" + str(index))
     glossary_element(cache_list, "Cache Levels", pdf)
     pdf.set_font('Arial', '', c.h4)
     pdf.cell(10, 10, " ", align="R")
     pdf.cell(50, 10, "The smallest index the nearest to CPU.", align='L')
     pdf.ln(c.meduim_new_line)
-    glossary_element(loops, "Loop Names", pdf)
+    glossary_element(c.loops, "Loop Names", pdf)
     pdf.set_font('Arial', 'B', c.h1)
 
 
@@ -155,13 +154,14 @@ def to_json(json, pdf):
     pdf.ln(c.small_new_line)
 
 
-def input_shape(arch_info, network_info, schedule_info, pdf):
+def input_shape(pdf, arch_info, network_info, schedule_info=None):
     pdf.set_font('Arial', 'B', c.h2)
     pdf.cell(0, 10, "Memory Architecture  : ", 0, 1, 'L')
     to_json(arch_info, pdf)
     pdf.set_font('Arial', 'B', c.h2)
     pdf.cell(0, 10, "Layer Architecture  : ", 0, 1, 'L')
     to_json(network_info, pdf)
-    pdf.set_font('Arial', 'B', c.h2)
-    pdf.cell(0, 10, "Schedule Architecture  : ", 0, 1, 'L')
-    to_json(schedule_info, pdf)
+    if schedule_info is not None:
+        pdf.set_font('Arial', 'B', c.h2)
+        pdf.cell(0, 10, "Schedule Architecture  : ", 0, 1, 'L')
+        to_json(schedule_info, pdf)

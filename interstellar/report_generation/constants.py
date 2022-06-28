@@ -25,3 +25,7 @@ margins used  : 30 for width
 width_margin = 30
 height_margin = 8
 
+"""
+loops symbols
+"""
+loops = ["FX", "FY", "OX", "OY", "OC", "IC", "ON"]

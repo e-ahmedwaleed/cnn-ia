@@ -5,7 +5,8 @@ import mapping as cm
 import verbose.dataflow as df_utils
 import verbose.loop_blocking as lb_utils
 import verbose.memory_explore as me_utils
-import report_generation.basic_report as report
+import report_generation.basic_report as basic_report
+import report_generation.dataflow_report as dataflow_report
 import verbose.utils as utils
 
 utils.enum_table = cm.loop_enum.table
@@ -30,10 +31,10 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
                            "measured in pJ")
         utils.print_output("SCHEDULE", lb_utils.tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
                            "b: blocking factor, p: partitioning unit")
-        report.generate_basic(opt_result[1],
-                              level_costs, resource.para_index,
-                              cm.utils.print_loop_nest(opt_result[1]),
-                              i_arch_info, i_network_info, i_schedule_info)
+        basic_report.generate_basic(opt_result[1],
+                                    level_costs, resource.para_index,
+                                    cm.utils.print_loop_nest(opt_result[1]),
+                                    i_arch_info, i_network_info, i_schedule_info)
 
     return opt_result
 
@@ -98,6 +99,7 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     if verbose:
         df_utils.print_tabulated_dataflow_results(dataflow_tb)
         df_utils.print_tabulated_best_schedules(cm.utils.print_loop_nest, dataflow_tb)
+        dataflow_report.generate(cm.utils.print_loop_nest, dataflow_tb, arch_info, network_info)
 
     return dataflow_tb
 

@@ -1,5 +1,7 @@
 import report_generation.constants as c
 import report_generation.writer as w
+
+
 def generate_basic(map_config, costs, para_index, schedules, arch_info, network_info, schedule_info):
     pdf = w.PDF()
     pdf.alias_nb_pages()
@@ -16,14 +18,14 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
     """
         Input Shape : The input from program
     """
-    w.input_shape(arch_info, network_info, schedule_info, pdf)
+    w.input_shape(pdf, arch_info, network_info, schedule_info)
 
     """ Glossary"""
 
     """  
         explanation of memory caches and layer parameters
     """
-    w.glossary(map_config.loop_blockings[0], pdf)
+    w.glossary(arch_info['mem_levels'], pdf)
     pdf.ln(c.meduim_new_line)
 
     """
