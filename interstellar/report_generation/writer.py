@@ -27,7 +27,7 @@ class PDF(FPDF):
         self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
 
 
-def write_loops(values, schedule_info, pdf):
+def write_loops(values, pdf, schedule_info=None):
     pdf.set_font('Arial', 'B', c.h4)
     pdf.ln(c.meduim_new_line)
     make_table(c.loops, values, pdf, schedule_info)
@@ -70,7 +70,7 @@ def write_cost_levels(costs, para_index, pdf):
     pdf.ln(c.large_new_line)
 
 
-def write_schedule(schedules,  partitioning_loops, pdf):
+def write_schedule(schedules, pdf, partitioning_loops=None):
     for schedule_index in reversed(range(0, len(schedules[0]))):
         schedules[0][schedule_index].reverse()
         pdf.set_font('Arial', 'B', c.h4)  # row header
@@ -92,7 +92,8 @@ def write_schedule(schedules,  partitioning_loops, pdf):
             loop_string = identify_loops_in_list_of_lists(schedules[1][schedule_index])
             pdf.cell(c.width_margin + taps, c.height_margin, "spatially unrolled loops: " + loop_string + '\n',
                      align='C')
-        pdf.ln(c.meduim_new_line)
+        pdf.ln(c.small_new_line)
+        pdf.set_font('Arial', 'B', c.h1)  # for values
 
 
 def glossary_element(arr, header, pdf):
@@ -125,7 +126,7 @@ def glossary(levels, pdf):
     pdf.ln(c.meduim_new_line)
     notations = ['FILTER WIDTH', "FILTER HEIGHT", "OUTPUT WIDTH", "OUTPUT HEIGHT",
                  "OUTPUT CHANNEL", "INPUT CHANNEL", "BATCH"]
-    write_key_value(c.loops, notations, pdf)
+    write_key_value(c.loops, notations, pdf, 10)
     pdf.set_font('Arial', 'B', c.h1)
 
 
@@ -150,7 +151,7 @@ def convert_dash_names_to_capital_names(names):
     return temp
 
 
-def make_table(rows, columns, pdf, schedule_hint=0):
+def make_table(rows, columns, pdf, schedule_hint=None):
     pdf.set_font('Arial', 'B', c.h4)  # for headers
     # write the first row ( L0,L1,..)
     pdf.cell(10, 10)
@@ -165,7 +166,7 @@ def make_table(rows, columns, pdf, schedule_hint=0):
         pdf.cell(c.width_margin, c.height_margin, rows[block_index], align='L')
         pdf.set_font('Arial', '', c.h4)
         # (Hinted schedule configurations are in green)
-        if schedule_hint != 0:
+        if schedule_hint is not None:
             if block_index in schedule_hint.keys():
                 for cell_index in range(0, len(block)):
                     if type(schedule_hint[block_index][cell_index]) is list:
@@ -189,18 +190,21 @@ def make_table(rows, columns, pdf, schedule_hint=0):
     pdf.ln(c.small_new_line)
 
 
-def write_key_value(keys, values, pdf):
+def write_key_value(keys, values, pdf, margin=60):
     for key in range(0, len(keys)):
         pdf.cell(25, 10)
         pdf.set_font('Arial', 'B', c.h4)  # for headers
-        pdf.cell(60, 5, str(keys[key]), align="L")
+        pdf.cell(margin, 5, str(keys[key]), align="L")
         pdf.set_font('Arial', '', c.h4)  # for values
-        pdf.cell(25, 10)
+        if margin == 60:
+            pdf.cell(25, 10)
         pdf.cell(20, 5, " :     " + str(values[key]), align="L")
         pdf.ln(c.inter_small_new_line)
 
 
 def to_mem_arch(arch, pdf):
+    pdf.set_font('Arial', 'B', c.h2)
+    pdf.cell(55, 10, "Memory Architecture  : ", "B", 1, 'L')
     mem_list = {}
     status_list = {}
     # put parallel cost for specific parallel mode
@@ -219,6 +223,7 @@ def to_mem_arch(arch, pdf):
             mem_list[key] = value
     if "memory_partitions" in mem_list:
         del mem_list['memory_partitions']
+
     # fill status_list
     status_list['precision'] = arch['precision']
     status_list['minimum_utilization'] = str(arch['utilization_threshold'] * 100) + "%"
@@ -227,32 +232,11 @@ def to_mem_arch(arch, pdf):
     # convert to title
     rows_status = convert_dash_names_to_capital_names(list(status_list.keys()))
     rows_mem = convert_dash_names_to_capital_names(list(mem_list.keys()))
+
     # write cahces
     make_table(rows_mem, list(mem_list.values()), pdf)
 
     # write status as a key : value
     write_key_value(rows_status, list(status_list.values()), pdf)
-
-
-def to_json(json, pdf):
-    pdf.set_font('Arial', '', c.h3)
-    pdf.cell(10, 5, "{ ", 0, 0, 'L')
-    pdf.ln(c.small_new_line)
-    for key, value in json.items():
-        pdf.cell(50, 5, key + " : ", 0, 0, 'L')
-        pdf.multi_cell(100, 5, str(value), 0, 0, 'L')
-    pdf.cell(10, 5, " }", 0, 1, 'L')
-    pdf.ln(c.small_new_line)
-
-
-def input_shape(pdf, arch_info, network_info, schedule_info=None):
-    pdf.set_font('Arial', 'B', c.h2)
-    pdf.cell(55, 10, "Memory Architecture  : ", "B", 1, 'L')
-    to_mem_arch(arch_info, pdf)
     pdf.set_font('Arial', 'B', c.h1)
-    # pdf.cell(0, 10, "Layer Architecture  : ", 0, 1, 'L')
-    # to_json(network_info, pdf)
-    # if schedule_info is not None:
-    #     pdf.set_font('Arial', 'B', c.h2)
-    #     pdf.cell(0, 10, "Schedule Architecture  : ", 0, 1, 'L')
-    #     to_json(schedule_info, pdf)
+

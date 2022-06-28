@@ -21,7 +21,7 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
     """
         Input Shape : The input from program
     """
-    w.input_shape(pdf, arch_info, network_info, schedule_info)
+    w.to_mem_arch(arch_info, pdf)
 
     """ Glossary"""
 
@@ -46,17 +46,17 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
     # loop blocking
 
     pdf.cell(50, 10, "Loop Blocking ( factors ): ", "B", 0, 'L')
-    w.write_loops(map_config.loop_blockings, list(schedule_info.values())[0], pdf)
+    w.write_loops(map_config.loop_blockings, pdf, list(schedule_info.values())[0])
 
     # loop partitioning
     pdf.set_font('Arial', 'B', c.h1)
     pdf.cell(50, 10, "Loop Partitioning ( units ): ", "B", 0, 'L')
-    w.write_loops(map_config.loop_partitionings, list(schedule_info.values())[0], pdf)
+    w.write_loops(map_config.loop_partitionings, pdf, list(schedule_info.values())[0])
 
     # loop ordering
     pdf.set_font('Arial', 'B', c.h1)
     pdf.cell(50, 10, "Loop Ordering (from the innermost): ", "B", 0, 'L')
-    w.write_loops(map_config.loop_orders, list(schedule_info.values())[0], pdf)
+    w.write_loops(map_config.loop_orders, pdf, list(schedule_info.values())[0])
     pdf.set_font('Arial', 'B', c.h4)
     pdf.set_text_color(0, 128, 0)
     pdf.ln(c.meduim_new_line)
@@ -73,7 +73,7 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
     pdf.set_font('Arial', 'B', c.h2)
     pdf.cell(100, 10, "The Best format for schedule found is : ")
     pdf.ln(c.meduim_new_line)
-    w.write_schedule(schedules,  list(schedule_info.values())[1], pdf)
+    w.write_schedule(schedules, pdf, list(schedule_info.values())[1])
     pdf.set_font('Arial', 'B', c.h4)
     pdf.set_text_color(0, 128, 0)
     pdf.cell(0, 5, "(Hinted loop unrollments are in green)", 0, 0, 'R')
