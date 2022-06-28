@@ -46,22 +46,23 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
     # loop blocking
 
     pdf.cell(66, 10, "Loop Blocking (factors):", "B", 0, 'L')
-    w.write_loops(map_config.loop_blockings, pdf, list(schedule_info.values())[0])
+    colored_1 = w.write_loops(map_config.loop_blockings, pdf, list(schedule_info.values())[0])
 
     # loop partitioning
     pdf.set_font('Arial', 'B', c.h1)
     pdf.cell(69, 10, "Loop Partitioning (units): ", "B", 0, 'L')
-    w.write_loops(map_config.loop_partitionings, pdf, list(schedule_info.values())[0])
+    colored_2 = w.write_loops(map_config.loop_partitionings, pdf, list(schedule_info.values())[0])
 
     # loop ordering
     pdf.set_font('Arial', 'B', c.h1)
     pdf.cell(100, 10, "Loop Ordering (from the innermost): ", "B", 0, 'L')
-    w.write_loops(map_config.loop_orders, pdf, list(schedule_info.values())[0])
+    colored_3 = w.write_loops(map_config.loop_orders, pdf, list(schedule_info.values())[0])
     pdf.set_font('Arial', 'B', c.h4)
-    pdf.set_text_color(0, 128, 0)
     pdf.ln(c.meduim_new_line)
-    pdf.cell(0, 5, "(Hinted schedule configurations are in green)", 0, 0, 'R')
-    pdf.set_text_color(0, 0, 0)
+    if colored_1 or colored_2 or colored_3:
+        pdf.set_text_color(0, 128, 0)
+        pdf.cell(0, 5, "(Hinted schedule configurations are in green)", 0, 0, 'R')
+        pdf.set_text_color(0, 0, 0)
     pdf.set_font('Arial', 'B', c.h1)
 
     """ 
@@ -69,14 +70,13 @@ def generate_basic(map_config, costs, para_index, schedules, arch_info, network_
     """
     pdf.add_page()
     pdf.cell(100, 10, "Schedule", 1, 1, 'C')
-    pdf.ln(c.meduim_new_line)
-    pdf.set_font('Arial', 'B', c.h2)
-    pdf.cell(100, 10, "The Best format for schedule found is : ")
-    pdf.ln(c.meduim_new_line)
-    w.write_schedule(schedules, pdf, list(schedule_info.values())[1])
+    pdf.ln(c.small_new_line)
+    # pdf.set_font('Arial', 'B', c.h2)
+    schedule_color = w.write_schedule(schedules, pdf, list(schedule_info.values())[1])
     pdf.set_font('Arial', 'B', c.h4)
-    pdf.set_text_color(0, 128, 0)
-    pdf.cell(0, 5, "(Hinted loop unrollments are in green)", 0, 0, 'R')
+    if schedule_color:
+        pdf.set_text_color(0, 128, 0)
+        pdf.cell(0, 5, "(Hinted loop unrollments are in green)", 0, 0, 'R')
     pdf.set_text_color(0, 0, 0)
     pdf.ln(c.meduim_new_line)
     pdf.set_font('Arial', 'B', c.h1)

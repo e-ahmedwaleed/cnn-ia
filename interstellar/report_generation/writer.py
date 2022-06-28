@@ -27,13 +27,6 @@ class PDF(FPDF):
         self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
 
 
-def write_loops(values, pdf, schedule_info=None):
-    pdf.set_font('Arial', 'B', c.h4)
-    pdf.ln(c.meduim_new_line)
-    make_table(c.loops, values, pdf, schedule_info)
-    pdf.set_font('Arial', 'B', c.h1)  # reset
-
-
 def write_cost_levels(costs, para_index, pdf):
     num_para = 0
     #  write first row headers
@@ -64,13 +57,14 @@ def write_cost_levels(costs, para_index, pdf):
     pdf.ln(c.meduim_new_line)
     if s_checked == "NOT_CHECKED":
         pdf.set_font('Arial', 'B', c.h3)
-        pdf.cell(c.width_margin, c.height_margin, "- L"+str(not_checked) +
+        pdf.cell(c.width_margin, c.height_margin, "- L" + str(not_checked) +
                  " memory was not checked for invalid underutilized.", align='L')
 
     pdf.ln(c.large_new_line)
 
 
 def write_schedule(schedules, pdf, partitioning_loops=None):
+    colored = False
     for schedule_index in reversed(range(0, len(schedules[0]))):
         schedules[0][schedule_index].reverse()
         pdf.set_font('Arial', 'B', c.h4)  # row header
@@ -82,6 +76,7 @@ def write_schedule(schedules, pdf, partitioning_loops=None):
             if loop:
                 taps += 10
                 if partitioning_loops and loop[0] in partitioning_loops:
+                    colored = True
                     pdf.set_text_color(0, 128, 0)
                 loop_string = schedule_details(loop)  # write the for statement
                 pdf.cell(c.width_margin + taps, c.height_margin, loop_string, align='C')
@@ -91,9 +86,11 @@ def write_schedule(schedules, pdf, partitioning_loops=None):
             # write the unrolled loops
             loop_string = identify_loops_in_list_of_lists(schedules[1][schedule_index])
             pdf.cell(c.width_margin + taps, c.height_margin, "spatially unrolled loops: " + loop_string + '\n',
-                     align='C')
+                     align='c')
+            pdf.ln(c.small_new_line)
         pdf.ln(c.small_new_line)
         pdf.set_font('Arial', 'B', c.h1)  # for values
+    return colored
 
 
 def glossary_element(arr, header, pdf):
@@ -159,11 +156,20 @@ def int_or_float(pdf, row_title, write):
         pdf.cell(c.width_margin, c.height_margin, str(float(write)), align='C')
 
 
+def write_loops(values, pdf, schedule_info=None):
+    pdf.set_font('Arial', 'B', c.h4)
+    pdf.ln(c.meduim_new_line)
+    colored = make_table(c.loops, values, pdf, schedule_info)
+    pdf.set_font('Arial', 'B', c.h1)  # reset
+    return colored
+
+
 def make_table(rows, columns, pdf, schedule_hint=None):
     pdf.set_font('Arial', 'B', c.h4)  # for headers
     # write the first row ( L0,L1,..)
     pdf.cell(10, 10)
     pdf.cell(c.width_margin, c.height_margin, " ", align='C')
+    colored = False
     for cell_index in range(0, len(columns[0])):
         pdf.cell(c.width_margin, c.height_margin, "L" + str(cell_index), align='C')
     pdf.ln(c.inter_small_new_line)
@@ -179,6 +185,7 @@ def make_table(rows, columns, pdf, schedule_hint=None):
                 for cell_index in range(0, len(block)):
                     if type(schedule_hint[block_index][cell_index]) is list:
                         if block[cell_index] in schedule_hint[block_index][cell_index]:
+                            colored = True
                             pdf.set_font('Arial', 'B', c.h4)
                             pdf.set_text_color(0, 128, 0)
                             int_or_float(pdf, rows[block_index], block[cell_index])
@@ -196,6 +203,7 @@ def make_table(rows, columns, pdf, schedule_hint=None):
                 int_or_float(pdf, rows[block_index], cell)
         pdf.ln(c.inter_small_new_line)
     pdf.ln(c.small_new_line)
+    return colored
 
 
 def write_key_value(keys, values, pdf, margin=60):
@@ -247,4 +255,3 @@ def to_mem_arch(arch, pdf):
     # write status as a key : value
     write_key_value(rows_status, list(status_list.values()), pdf, 55)
     pdf.set_font('Arial', 'B', c.h1)
-
