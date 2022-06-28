@@ -12,10 +12,12 @@ h4 = 10
 h5 = 8
 
 """
-line spaces used  : 5, 10, 20
+line spaces used  : 5, 10, 15, 20
 """
 small_new_line = 5
+inter_small_new_line = 7
 meduim_new_line = 10
+inter_mid_new_line = 15
 large_new_line = 20
 
 """
