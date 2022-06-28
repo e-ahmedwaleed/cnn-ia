@@ -151,6 +151,14 @@ def convert_dash_names_to_capital_names(names):
     return temp
 
 
+def int_or_float(pdf, row_title, write):
+    int_presented = ["Capacity", "Parallel count", "Parallel mode"]
+    if row_title in int_presented:
+        pdf.cell(c.width_margin, c.height_margin, str(int(write)), align='C')
+    else:
+        pdf.cell(c.width_margin, c.height_margin, str(float(write)), align='C')
+
+
 def make_table(rows, columns, pdf, schedule_hint=None):
     pdf.set_font('Arial', 'B', c.h4)  # for headers
     # write the first row ( L0,L1,..)
@@ -173,19 +181,19 @@ def make_table(rows, columns, pdf, schedule_hint=None):
                         if block[cell_index] in schedule_hint[block_index][cell_index]:
                             pdf.set_font('Arial', 'B', c.h4)
                             pdf.set_text_color(0, 128, 0)
-                            pdf.cell(c.width_margin, c.height_margin, str(int(block[cell_index])), align='C')
+                            int_or_float(pdf, rows[block_index], block[cell_index])
                             pdf.set_text_color(0, 0, 0)
                             pdf.set_font('Arial', '', c.h4)
                         else:
-                            pdf.cell(c.width_margin, c.height_margin, str(int(block[cell_index])), align='C')
+                            int_or_float(pdf, rows[block_index], block[cell_index])
                     else:
-                        pdf.cell(c.width_margin, c.height_margin, str(int(block[cell_index])), align='C')
+                        int_or_float(pdf, rows[block_index], block[cell_index])
             else:
                 for cell in block:
-                    pdf.cell(c.width_margin, c.height_margin, str(int(cell)), align='C')
+                    int_or_float(pdf, rows[block_index], cell)
         else:
             for cell in block:
-                pdf.cell(c.width_margin, c.height_margin, str(int(cell)), align='C')
+                int_or_float(pdf, rows[block_index], cell)
         pdf.ln(c.inter_small_new_line)
     pdf.ln(c.small_new_line)
 
@@ -203,6 +211,7 @@ def write_key_value(keys, values, pdf, margin=60):
 
 
 def to_mem_arch(arch, pdf):
+    print(arch)
     pdf.set_font('Arial', 'B', c.h2)
     pdf.cell(55, 10, "Memory Architecture  : ", "B", 1, 'L')
     mem_list = {}
