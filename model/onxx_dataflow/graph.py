@@ -35,7 +35,10 @@ class Graph:
             self.onnx_nodes[i].identify_node_parameters(onnx_initializers)
 
     def save(self):
-        dir_path = utils.choose_folder_dialog('Choose output folder') + "/output"
+        selected_path = utils.choose_folder_dialog('Choose output folder')
+        if not selected_path:
+            return None
+        dir_path = selected_path + "/output"
         utils.delete_folder(dir_path)
         utils.create_folder(dir_path)
 

@@ -3,6 +3,6 @@
 [python-3.9.13-amd64](https://www.python.org/downloads/release/python-3913/), [VC_redist.x64](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
 ```sh
 python -m pip install --upgrade pip
-python -m pip install PyQt5 netron onnx torch torchvision tensorflow tf2onnx
+python -m pip install PyQt5 onnx torch torchvision tensorflow tf2onnx
 ```
 > :warning: **Do not touch the master branch**: just don't!
