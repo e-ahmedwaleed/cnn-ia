@@ -12,6 +12,6 @@ def extract(path):
             raise Exception('Canceled')
         utils.sleep(1.0)
         utils.open_folder(dir_path)
-        return "Model Extracted Successfully (you might need to close the browser to continue using the program)"
+        return "Model Extracted Successfully."
     except:
         return "Model Extraction Failed!"

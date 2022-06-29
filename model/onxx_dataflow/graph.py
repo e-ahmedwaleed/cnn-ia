@@ -2,6 +2,8 @@ import onnx
 
 from gui import utils
 from onnx import numpy_helper
+
+from model.onxx_dataflow.graph_dims import GraphDims
 from model.onxx_dataflow.graph_properties import Node
 
 
@@ -26,12 +28,17 @@ class Graph:
             onnx_nodes_inputs[self.onnx_nodes[i].name] = node_data.input
             onnx_nodes_outputs[self.onnx_nodes[i].name] = node_data.output
 
+        graph_outputs = GraphDims(self.path, onnx_nodes_outputs)
+
+        first_node = self.onnx_nodes[0]
+        last_node = self.onnx_nodes[len(self.onnx_nodes) - 1]
         # Assuming that the model will have a single input/output
-        self.onnx_nodes[0].inputs[0] = "MODEL_INPUT: " + self.identify_dim(model.graph.input)
-        self.onnx_nodes[len(self.onnx_nodes) - 1].outputs[0] = "MODEL_OUTPUT: " + self.identify_dim(model.graph.output)
+        first_node.inputs[0] = "MODEL_INPUT " + graph_outputs.identify_node_dim()
+        last_node.outputs[0] = graph_outputs.identify_node_dim(last_node.name) + " MODEL_OUTPUT"
+
         for i in self.onnx_nodes:
-            self.onnx_nodes[i].identify_node_inputs(onnx_nodes_outputs)
-            self.onnx_nodes[i].identify_node_outputs(onnx_nodes_inputs)
+            self.onnx_nodes[i].identify_node_inputs(onnx_nodes_outputs, graph_outputs.identify_node_dim)
+            self.onnx_nodes[i].identify_node_outputs(onnx_nodes_inputs, graph_outputs.identify_node_dim)
             self.onnx_nodes[i].identify_node_parameters(onnx_initializers)
 
     def save(self):
@@ -52,11 +59,3 @@ class Graph:
         utils.create_file(metadata, topology)
 
         return metadata
-
-    @staticmethod
-    def identify_dim(var):
-        dims = [[d.dim_value for d in _var.type.tensor_type.shape.dim] for _var in var][0]
-        for i, dim in enumerate(dims):
-            if not dim:
-                dims[i] = 1
-        return str(dims).replace('[', '(').replace(']', ')')
