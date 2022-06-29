@@ -2,7 +2,7 @@
 from fpdf import FPDF
 from datetime import date
 from verbose.utils import identify_loops_in_list_of_lists
-import report_generation.constants as c
+import reports.constants as c
 
 
 class PDF(FPDF):
@@ -32,7 +32,7 @@ def write_cost_levels(costs, para_index, pdf):
     #  write first row headers
     pdf.set_font('Arial', 'B', c.h3)  # for headers
     pdf.cell(c.width_margin, c.height_margin, "MEM ", align='L')
-    pdf.cell(c.width_margin, c.height_margin, "ENERGY (PJ) ", align='L')
+    pdf.cell(c.width_margin, c.height_margin, "ENERGY (pJ) ", align='L')
     pdf.ln(c.inter_small_new_line)
     pdf.set_font('Arial', '', c.h4)  # for headers
     for cell_index in range(0, len(costs) - 1):
@@ -75,10 +75,11 @@ def write_schedule(schedules, pdf, partitioning_loops=None):
         for loop in schedules[0][schedule_index]:
             if loop:
                 taps += 10
-                if partitioning_loops and loop[0] in partitioning_loops:
+                loop_string = schedule_details(loop)  # write the for statement
+                # color the spatially unrolled loops based on schedule partitioning
+                if partitioning_loops and schedules[1][schedule_index] and loop[0] in partitioning_loops:
                     colored = True
                     pdf.set_text_color(0, 128, 0)
-                loop_string = schedule_details(loop)  # write the for statement
                 pdf.cell(c.width_margin + taps, c.height_margin, loop_string, align='C')
                 pdf.set_text_color(0, 0, 0)
                 pdf.ln(c.small_new_line)
@@ -124,14 +125,15 @@ def glossary(levels, pdf):
     pdf.ln(c.meduim_new_line)
     notations = ['FILTER WIDTH', "FILTER HEIGHT", "OUTPUT WIDTH", "OUTPUT HEIGHT",
                  "OUTPUT CHANNEL", "INPUT CHANNEL", "BATCH"]
-    write_key_value(c.loops, notations, pdf, 10)
+    shift_tap = len("Loop Notations")
+    write_key_value(c.loops, notations, pdf, 10, True)
     pdf.set_font('Arial', 'B', c.h1)
 
 
 # Introduction
 def introduction(body, pdf):
     pdf.set_font('Arial', '', c.h2)
-    pdf.multi_cell(0, c.height_margin, body, 0, 1, "L")
+    pdf.multi_cell(0, c.height_margin, body, 0, 0)
     pdf.ln(c.small_new_line)
 
 
@@ -207,23 +209,25 @@ def make_table(rows, columns, pdf, schedule_hint=None):
     return colored
 
 
-def write_key_value(keys, values, pdf, margin=60):
+def write_key_value(keys, values, pdf, margin=60, tap=False):
     for key in range(0, len(keys)):
-        pdf.cell(25, 10)
+        if tap:
+            pdf.cell(14.8, 10)
+        pdf.cell(10, 10)
         pdf.set_font('Arial', 'B', c.h4)  # for headers
         pdf.cell(margin, 5, str(keys[key]), align="L")
         pdf.set_font('Arial', '', c.h4)  # for values
 
-        pdf.cell(20, 5, " :  " + str(values[key]), align="L")
+        pdf.cell(20, 5, "     :  " + str(values[key]), align="L")
         pdf.ln(c.inter_small_new_line)
 
 
 def to_mem_arch(arch, pdf):
-    print(arch)
     pdf.set_font('Arial', 'B', c.h2)
     pdf.cell(52, 10, "Memory Architecture:", "B", 1, 'L')
     mem_list = {}
     status_list = {}
+    mem_levels = arch['mem_levels']
     # put parallel cost for specific parallel mode
     temp_para_cost = []
     parallel_cost = arch['parallel_cost']
@@ -236,7 +240,7 @@ def to_mem_arch(arch, pdf):
 
     # fill mem_list
     for key, value in arch.items():
-        if type(value) is list and len(value) == arch['mem_levels']:
+        if type(value) is list and len(value) == mem_levels:
             mem_list[key] = value
     if "memory_partitions" in mem_list:
         del mem_list['memory_partitions']
@@ -253,6 +257,7 @@ def to_mem_arch(arch, pdf):
     # write cahces
     make_table(rows_mem, list(mem_list.values()), pdf)
 
+    pdf.line(20, 130, (30 * (mem_levels + 1)) + 20, 130)
     # write status as a key : value
-    write_key_value(rows_status, list(status_list.values()), pdf, 55)
+    write_key_value(rows_status, list(status_list.values()), pdf, 60)
     pdf.set_font('Arial', 'B', c.h1)

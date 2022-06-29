@@ -5,9 +5,9 @@ import mapping as cm
 import verbose.dataflow as df_utils
 import verbose.loop_blocking as lb_utils
 import verbose.memory_explore as me_utils
-import report_generation.basic_report as basic_report
-import report_generation.dataflow_report as dataflow_report
-import report_generation.memory_report as memory_report
+import reports.basic_report as basic_report
+import reports.dataflow_report as dataflow_report
+import reports.memory_report as memory_report
 import verbose.utils as utils
 
 utils.enum_table = cm.loop_enum.table
