@@ -25,7 +25,7 @@ class ParametersExtractorGUI(object):
         main_window.setMaximumSize(QtCore.QSize(640, 160))
         icon = QtGui.QIcon()
         project_dir = __file__.replace("\\gui\\parameters_extractor_gui.py", "").replace("\\", "/")
-        icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/Icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/main-icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         main_window.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(main_window)
         self.centralwidget.setObjectName("centralwidget")

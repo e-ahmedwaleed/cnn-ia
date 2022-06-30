@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Imgs">
+        <file>main-icon.png</file>
+        <file>netron-icon.png</file>
+    </qresource>
+</RCC>
