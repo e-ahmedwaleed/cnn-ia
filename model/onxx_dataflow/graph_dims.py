@@ -29,9 +29,10 @@ class GraphDims:
         return dict(zip(outputs, ort_outs))
 
     def __generate_random_input(self, model):
-        # TODO: dynamic type! (not static float32)
         self.dims[''] = self.identify_tensor_dim(model.graph.input)
-        return np.random.rand(*self.dims['']).astype(np.float32)
+        from onnx.mapping import TENSOR_TYPE_TO_NP_TYPE
+        data_type = TENSOR_TYPE_TO_NP_TYPE[model.graph.input[0].type.tensor_type.elem_type]
+        return np.random.rand(*self.dims['']).astype(data_type)
 
     @staticmethod
     def identify_tensor_dim(var):

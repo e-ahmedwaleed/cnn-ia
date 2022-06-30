@@ -13,6 +13,7 @@ class Graph:
         self.onnx_nodes = {}
 
     def identify_model_graph(self):
+        Node.id = 0
         model = onnx.load(self.path)
         onnx.checker.check_model(model)
 
@@ -49,13 +50,7 @@ class Graph:
         utils.delete_folder(dir_path)
         utils.create_folder(dir_path)
 
-        topology = ""
-
         for i in self.onnx_nodes:
-            topology += self.onnx_nodes[i].name + '\n'
             self.onnx_nodes[i].save(dir_path)
 
-        metadata = dir_path + "/topology.metadata"
-        utils.create_file(metadata, topology)
-
-        return metadata
+        return dir_path + '/' + self.onnx_nodes[0].name + ".node"

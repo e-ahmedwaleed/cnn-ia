@@ -47,6 +47,8 @@ class Attribute(Property):
 
 
 class Node(Property):
+    id = 0
+
     def __init__(self, node_data):
         self.inputs = list(node_data.input)
         self.outputs = list(node_data.output)
@@ -54,7 +56,9 @@ class Node(Property):
         for i, attribute_data in enumerate(node_data.attribute):
             self.attributes.append(Attribute(attribute_data))
         self.parameters = []
-        super().__init__(node_data.name, node_data.op_type)
+        node_name = str(Node.id) + '_' + node_data.op_type
+        Node.id += 1
+        super().__init__(node_name, node_data.op_type)
 
     def identify_node_inputs(self, outputs, dim):
         for i, node in enumerate(self.inputs):
@@ -77,7 +81,7 @@ class Node(Property):
                     unmatched = False
                     self.parameters[i] = initializers[j]
             if unmatched:
-                print("Unmatched parameter!?")
+                print("Unmatched parameter: " + str(node) + " @ " + self.name)
         pass
 
     def identify_node_outputs(self, inputs, dim):
@@ -89,9 +93,10 @@ class Node(Property):
                         unmatched = False
                         self.outputs[i] = dim(self.name) + ' ' + j
             if unmatched & ("MODEL_OUTPUT" not in node):
-                print("Unmatched output!?")
+                self.outputs.remove(node)
+                print("Unused output dropped: " + str(node) + " @ " + self.name)
 
-    def save(self, path):
+    def save(self, path, extract_parameters=False):
         summary = super().__str__() + ":\n"
 
         summary += self.field_to_string(self.attributes, "Attributes:")
@@ -100,8 +105,11 @@ class Node(Property):
         if len(self.parameters):
             summary += '\t' + "Parameters:" + '\n'
             for i, parameter in enumerate(self.parameters):
-                param_file = self.save_parameter(path, self.name + "_" + str(i), parameter)
-                summary += "\t\t" + param_file + ".param '" + str(parameter.dtype) + "': " + str(parameter.shape) + '\n'
+                param_name = self.name + "_" + str(i)
+                if extract_parameters:
+                    param_name += ".param"
+                    self.save_parameter(path, param_name, parameter)
+                summary += "\t\t" + param_name + " '" + str(parameter.dtype) + "': " + str(parameter.shape) + '\n'
 
         summary += self.field_to_string(self.outputs, "Outputs:")
         utils.create_file(path + '/' + self.name + ".node", summary)
@@ -120,4 +128,3 @@ class Node(Property):
         import numpy as np
         np.set_printoptions(threshold=np.inf)
         utils.create_file(path + '/' + file_name + ".param", str(parameter))
-        return file_name
