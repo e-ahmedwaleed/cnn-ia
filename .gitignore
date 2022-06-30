@@ -3,6 +3,7 @@ venv/
 data/
 *__pycache__
 
+*.pdf
 CNN-*
 output/
 *interstellar-*

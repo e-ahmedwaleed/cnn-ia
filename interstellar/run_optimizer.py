@@ -2,18 +2,18 @@ import time
 import argparse
 import numpy as np
 import mapping as cm
+import verbose.utils as utils
 import verbose.dataflow as df_utils
 import verbose.loop_blocking as lb_utils
 import verbose.memory_explore as me_utils
 import reports.basic_report as basic_report
-import reports.dataflow_report as dataflow_report
 import reports.memory_report as memory_report
-import verbose.utils as utils
+import reports.dataflow_report as dataflow_report
 
 utils.enum_table = cm.loop_enum.table
 
 
-def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
+def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False, reports=True):
     # Hardware resource specification
     resource = cm.Resource.arch(arch_info)
     # NN layer specification
@@ -32,15 +32,17 @@ def basic_optimizer(arch_info, network_info, schedule_info=None, verbose=False):
                            "measured in pJ")
         utils.print_output("SCHEDULE", lb_utils.tabulate_loop_blocking(cm.utils.print_loop_nest(opt_result[1])),
                            "b: blocking factor, p: partitioning unit")
-        basic_report.generate_basic(opt_result[1],
-                                    level_costs, resource.para_index,
-                                    cm.utils.print_loop_nest(opt_result[1]),
-                                    i_arch_info, i_network_info, i_schedule_info)
+
+        if reports:
+            basic_report.generate_basic(opt_result[1],
+                                        level_costs, resource.para_index,
+                                        cm.utils.print_loop_nest(opt_result[1]),
+                                        i_arch_info, i_network_info, i_schedule_info)
 
     return opt_result
 
 
-def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False):
+def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False, reports=True):
     assert "explore_points" in arch_info, "missing explore_points in arch file"
     assert "capacity_scale" in arch_info, "missing capacity_scale in arch file"
     assert "access_cost_scale" in arch_info, "missing access_cost_scale in arch file"
@@ -79,12 +81,14 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False)
         utils.print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
         content, note = me_utils.tabulate_optimal_arch(exploration_tb)
         utils.print_output("OPTIMAL COST", content, note)
-        memory_report.generate(exploration_tb, content, note, arch_info, network_info)
+
+        if reports:
+            memory_report.generate(exploration_tb, arch_info, network_info)
 
     return exploration_tb
 
 
-def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False):
+def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False, reports=True):
     # TODO: compare and fix other assertions
     # Many dataflow explorations failed because of the wrong assertion from before
     # assert arch_info["parallel_count"][0] > 1, \
@@ -101,7 +105,9 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     if verbose:
         df_utils.print_tabulated_dataflow_results(dataflow_tb)
         df_utils.print_tabulated_best_schedules(cm.utils.print_loop_nest, dataflow_tb)
-        dataflow_report.generate(cm.utils.print_loop_nest, dataflow_tb, arch_info, network_info)
+
+        if reports:
+            dataflow_report.generate(cm.utils.print_loop_nest, dataflow_tb, arch_info, network_info)
 
     return dataflow_tb
 
@@ -114,6 +120,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--schedule", help="restriction of the schedule space")
     parser.add_argument("-n", "--name", default="dataflow_table", help="name for the dumped pickle file")
     parser.add_argument("-v", "--verbose", action='count', help="verbosity")
+    # TODO: consider adding argument for report generation
     args = parser.parse_args()
 
     start = time.time()

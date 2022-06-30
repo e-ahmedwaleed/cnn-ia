@@ -5,29 +5,29 @@ font_sizes used : 16 for h1
                   10 for h4
                   8 for h4
 """
-h1 = 16
-h2 = 14
-h3 = 12
-h4 = 10
-h5 = 8
+H1 = 16
+H2 = 14
+H3 = 12
+H4 = 10
+H5 = 8
 
 """
-line spaces used  : 5, 10, 15, 20
+line spaces used  : 5, 7, 10, 15, 20
 """
-small_new_line = 5
-inter_small_new_line = 7
-meduim_new_line = 10
-inter_mid_new_line = 15
-large_new_line = 20
+SMALL_NEW_LINE = 5
+INTER_SMALL_NEW_LINE = 7
+MEDIUM_NEW_LINE = 10
+INTER_MID_NEW_LINE = 15
+LARGE_NEW_LINE = 20
 
 """
 margins used  : 30 for width
                 8 for height
 """
-width_margin = 30
-height_margin = 8
+WIDTH_MARGIN = 30
+HEIGHT_MARGIN = 8
 
 """
 loops symbols
 """
-loops = ["FX", "FY", "OX", "OY", "OC", "IC", "ON"]
+LOOPS = ["FX", "FY", "OX", "OY", "OC", "IC", "ON"]
