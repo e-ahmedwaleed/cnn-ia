@@ -4,7 +4,7 @@ data/
 *__pycache__
 
 *.pdf
-CNN-*
+*.onnx
 output/
 *interstellar-*
 
