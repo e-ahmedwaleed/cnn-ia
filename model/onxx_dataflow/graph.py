@@ -14,7 +14,7 @@ class Graph:
 
     def identify_model_graph(self):
         # Reset node ids for every model
-        Node.id = 0
+        Node.type_id = {}
 
         model = onnx.load(self.path)
         onnx.checker.check_model(model)
@@ -46,32 +46,16 @@ class Graph:
             node.identify_node_output(onnx_nodes_inputs, graph_outputs.identify_node_dim)
             node.identify_node_parameters(onnx_initializers)
 
-        # Add node depth in addition to node id
-        self.normalized_node_id()
-
-        # Update graph nodes names to match the extracted
+        # Update graph nodes types to match the extracted names
+        # so that netron defaults will give a desired outcome
         for node in self.onnx_nodes:
             node.update_graph_node_name()
 
+        # TODO: make this safer by saving that model in the output folder
+        # Make sure the replica model is in the project dir
+        self.path = self.path[self.path.rfind('/') + 1:]
         onnx.save(model, self.path)
-
-    def normalized_node_id(self):
-        nodes_depth = {self.onnx_nodes[0].name: 0}
-        self.onnx_nodes[0].name = "0_" + self.onnx_nodes[0].name
-
-        for node in self.onnx_nodes[1:]:
-            # Identify each node true depth
-            max_parent_id = 0
-            for parent in node.inputs:
-                parent_name = parent[0:parent.find('(') - 1]
-                max_parent_id = max(max_parent_id, nodes_depth[parent_name])
-            nodes_depth[node.name] = max_parent_id + 1
-
-            # Append depth to names
-            node.name = str(nodes_depth[node.name]) + '_' + node.name
-            for i, parent in enumerate(node.inputs):
-                parent_name = parent[0:parent.find('(') - 1]
-                node.inputs[i] = str(nodes_depth[parent_name]) + '_' + parent
+        return self.path
 
     def save(self):
         selected_path = utils.choose_folder_dialog('Choose output folder')
@@ -84,4 +68,4 @@ class Graph:
         for node in self.onnx_nodes:
             node.save(dir_path)
 
-        return dir_path + '/' + self.onnx_nodes[0].name + ".node"
+        return dir_path

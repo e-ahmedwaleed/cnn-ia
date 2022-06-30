@@ -47,7 +47,7 @@ class Attribute(Property):
 
 
 class Node(Property):
-    id = 0
+    type_id = {}
 
     def __init__(self, graph_node):
         # A layer knows about all of its inputs and the size of its output
@@ -61,8 +61,10 @@ class Node(Property):
         self.parameters = []
 
         # An ID is added to each layer to have a unique name
-        node_name = str(Node.id) + '_' + graph_node.op_type
-        Node.id += 1
+        if graph_node.op_type not in Node.type_id:
+            Node.type_id[graph_node.op_type] = 0
+        node_name = str(Node.type_id[graph_node.op_type]) + '_' + graph_node.op_type
+        Node.type_id[graph_node.op_type] += 1
 
         # Keep track of original node to update name later
         self.graph_node = graph_node
@@ -113,7 +115,7 @@ class Node(Property):
                 self.output.remove(node)
 
     def update_graph_node_name(self):
-        self.graph_node.name = self.name
+        self.graph_node.op_type = self.name
 
     def save(self, path):
         summary = super().__str__() + ":\n"
