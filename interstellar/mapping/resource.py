@@ -99,7 +99,6 @@ class Resource(object):
             for i in range(self.num_levels):
                 # when using non-default partition mode, the parallelism
                 # count needs to be large than 1
-		# TODO: DELETE para_count_list[i] -> para_count_list
                 assert partition_mode[i] == 0 or para_count_list[i] <= 1 \
                        or (partition_mode[i] > 0 and para_count_list[i] > 1)
                 if partition_mode[i] == 1 or partition_mode[i] == 2:

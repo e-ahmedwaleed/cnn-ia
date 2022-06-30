@@ -412,7 +412,7 @@ def get_array_access_and_cost(level, para, access_list, point):
     '''
 
     para_mode = para.access_mode
-    assert para_mode == 1 or para_mode == 2  # Don't get it
+    assert para_mode == 1 or para_mode == 2
 
     array_dim = para.array_dim
     para_count = para.array_width
@@ -799,7 +799,7 @@ def get_array_level_cost(resource, point, layer_size, level, next_level_access, 
     Far jump happens because of dataflow spatial replication (e.g. 2D array -> kinds of 3D array)
     '''
 
-    # TODO add support for other access_mode # don't get it
+    # TODO add support for other access_mode
     # LMEI to distinguish O (partial sum) in buffer_access from A and W
 
     assert resource.paras[level].count and resource.paras[level].access_mode
