@@ -49,22 +49,24 @@ class Attribute(Property):
 class Node(Property):
     id = 0
 
-    def __init__(self, node_data):
+    def __init__(self, graph_node):
         # A layer knows about all of its inputs and the size of its output
-        self.inputs = list(node_data.input)
-        self.output = list(node_data.output)
+        self.inputs = list(graph_node.input)
+        self.output = list(graph_node.output)
 
         # It also knows the details about its attributes and parameters
         self.attributes = []
-        for i, attribute_data in enumerate(node_data.attribute):
+        for i, attribute_data in enumerate(graph_node.attribute):
             self.attributes.append(Attribute(attribute_data))
         self.parameters = []
 
         # An ID is added to each layer to have a unique name
-        node_name = str(Node.id) + '_' + node_data.op_type
+        node_name = str(Node.id) + '_' + graph_node.op_type
         Node.id += 1
 
-        super().__init__(node_name, node_data.op_type)
+        # Keep track of original node to update name later
+        self.graph_node = graph_node
+        super().__init__(node_name, graph_node.op_type)
 
     def identify_node_inputs(self, outputs, dim):
         for i, node in enumerate(self.inputs):
@@ -109,6 +111,9 @@ class Node(Property):
             # Remove other unused outputs (as in 'Dropout' layers)
             if unmatched & ("MODEL_OUTPUT" not in node):
                 self.output.remove(node)
+
+    def update_graph_node_name(self):
+        self.graph_node.name = self.name
 
     def save(self, path):
         summary = super().__str__() + ":\n"

@@ -9,9 +9,9 @@ def extract(path):
         dataflow.identify_model_graph()
         dir_path = dataflow.save()
         if dir_path is None:
-            raise Exception('Canceled')
+            raise Exception('Model Extraction Canceled.')
         utils.sleep(1.0)
         utils.open_folder(dir_path)
         return "Model Extracted Successfully."
-    except:
-        return "Model Extraction Failed!"
+    except Exception as e:
+        return str(e)

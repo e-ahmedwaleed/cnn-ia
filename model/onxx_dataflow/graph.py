@@ -46,8 +46,14 @@ class Graph:
             node.identify_node_output(onnx_nodes_inputs, graph_outputs.identify_node_dim)
             node.identify_node_parameters(onnx_initializers)
 
-        # Add node depth in addition to node id (.Maro :pepeEvil:)
+        # Add node depth in addition to node id
         self.normalized_node_id()
+
+        # Update graph nodes names to match the extracted
+        for node in self.onnx_nodes:
+            node.update_graph_node_name()
+
+        onnx.save(model, self.path)
 
     def normalized_node_id(self):
         nodes_depth = {self.onnx_nodes[0].name: 0}
