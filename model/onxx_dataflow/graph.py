@@ -10,47 +10,67 @@ from model.onxx_dataflow.graph_properties import Node
 class Graph:
     def __init__(self, path):
         self.path = path
-        self.onnx_nodes = {}
+        self.model = None
+        self.onnx_nodes = []
 
     def identify_model_graph(self):
-        Node.id = 0
+        # Reset node ids for every model
+        Node.type_id = {}
+
+        # Note: Different versions or missing operators are beyond our scope
         model = onnx.load(self.path)
         onnx.checker.check_model(model)
 
+        # Extract model parameters
         onnx_initializers = {}
         for initializer in model.graph.initializer:
             w = numpy_helper.to_array(initializer)
             onnx_initializers[initializer.name] = w
 
+        # Extract model layers
         onnx_nodes_inputs = {}
         onnx_nodes_outputs = {}
         for i, node_data in enumerate(model.graph.node):
-            self.onnx_nodes[i] = Node(node_data)
+            self.onnx_nodes.append(Node(node_data))
             onnx_nodes_inputs[self.onnx_nodes[i].name] = node_data.input
             onnx_nodes_outputs[self.onnx_nodes[i].name] = node_data.output
 
+        # Create a parallel model to identify the output of every layer
         graph_outputs = GraphDims(self.path, onnx_nodes_outputs)
 
-        first_node = self.onnx_nodes[0]
-        last_node = self.onnx_nodes[len(self.onnx_nodes) - 1]
         # Assuming that the model will have a single input/output
-        first_node.inputs[0] = "MODEL_INPUT " + graph_outputs.identify_node_dim()
-        last_node.outputs[0] = graph_outputs.identify_node_dim(last_node.name) + " MODEL_OUTPUT"
+        self.onnx_nodes[0].inputs[0] = "MODEL_INPUT " + graph_outputs.identify_node_dim()
+        self.onnx_nodes[-1].output[0] = graph_outputs.identify_node_dim(self.onnx_nodes[-1].name) + " MODEL_OUTPUT"
 
-        for i in self.onnx_nodes:
-            self.onnx_nodes[i].identify_node_inputs(onnx_nodes_outputs, graph_outputs.identify_node_dim)
-            self.onnx_nodes[i].identify_node_outputs(onnx_nodes_inputs, graph_outputs.identify_node_dim)
-            self.onnx_nodes[i].identify_node_parameters(onnx_initializers)
+        # Connect model layers and parameters
+        for node in self.onnx_nodes:
+            node.identify_node_inputs(onnx_nodes_outputs, graph_outputs.identify_node_dim)
+            node.identify_node_output(onnx_nodes_inputs, graph_outputs.identify_node_dim)
+            node.identify_node_parameters(onnx_initializers)
+
+        # Update graph nodes types to match the extracted names
+        # so that netron defaults will give a desired outcome
+        for node in self.onnx_nodes:
+            node.update_graph_node_name()
+
+        # Make sure the replica model is in the output dir
+        self.model = model
+        self.path = self.path[self.path.rfind('/') + 1:]
+
+        return self.path
 
     def save(self):
         selected_path = utils.choose_folder_dialog('Choose output folder')
         if not selected_path:
             return None
+
         dir_path = selected_path + "/output"
         utils.delete_folder(dir_path)
         utils.create_folder(dir_path)
 
-        for i in self.onnx_nodes:
-            self.onnx_nodes[i].save(dir_path)
+        onnx.save(self.model, dir_path + '/' + self.path)
 
-        return dir_path + '/' + self.onnx_nodes[0].name + ".node"
+        for node in self.onnx_nodes:
+            node.save(dir_path)
+
+        return dir_path

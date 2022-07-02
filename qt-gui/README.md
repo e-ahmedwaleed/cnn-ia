@@ -1,3 +1,3 @@
 ```
-pyuic5 -x "...\form.ui" -o "...\gui.py"
+.\venv\Scripts\python.exe -m PyQt5.uic.pyuic -x "...\form.ui" -o "...\gui.py"
 ```

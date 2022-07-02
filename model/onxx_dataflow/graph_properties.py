@@ -47,56 +47,77 @@ class Attribute(Property):
 
 
 class Node(Property):
-    id = 0
+    type_id = {}
 
-    def __init__(self, node_data):
-        self.inputs = list(node_data.input)
-        self.outputs = list(node_data.output)
+    def __init__(self, graph_node):
+        # A layer knows about all of its inputs and the size of its output
+        self.inputs = list(graph_node.input)
+        self.output = list(graph_node.output)
+
+        # It also knows the details about its attributes and parameters
         self.attributes = []
-        for i, attribute_data in enumerate(node_data.attribute):
+        for i, attribute_data in enumerate(graph_node.attribute):
             self.attributes.append(Attribute(attribute_data))
         self.parameters = []
-        node_name = str(Node.id) + '_' + node_data.op_type
-        Node.id += 1
-        super().__init__(node_name, node_data.op_type)
+
+        # An ID is added to each layer to have a unique name
+        if graph_node.op_type not in Node.type_id:
+            Node.type_id[graph_node.op_type] = 0
+        node_name = str(Node.type_id[graph_node.op_type]) + '_' + graph_node.op_type
+        Node.type_id[graph_node.op_type] += 1
+
+        # Keep track of original node to update name later
+        self.graph_node = graph_node
+        super().__init__(node_name, graph_node.op_type)
 
     def identify_node_inputs(self, outputs, dim):
         for i, node in enumerate(self.inputs):
             unmatched = True
+            # Look for the layer inputs in others output to find parent layers
             for j in outputs:
                 for k in outputs[j]:
                     if node == k:
                         unmatched = False
+                        # Append the parent layer along with its output size
                         self.inputs[i] = j + ' ' + dim(j)
+            # If the input not found as layer output, then it is a parameter
             if unmatched & ("MODEL_INPUT" not in node):
                 self.parameters.append(node)
+        # Delete parameters from input list, since they have a special one
         for parameter in self.parameters:
             self.inputs.remove(parameter)
 
     def identify_node_parameters(self, initializers):
         for i, node in enumerate(self.parameters):
             unmatched = True
+            # Look for the layer inputs that was marked as parameters in the graph initializers (parameters)
             for j in initializers:
                 if node == j:
                     unmatched = False
                     self.parameters[i] = initializers[j]
+            # Well ideally this should never happen
             if unmatched:
-                print("Unmatched parameter: " + str(node) + " @ " + self.name)
-        pass
+                raise Exception("Unmatched parameter: " + str(node) + " @ " + self.name)
 
-    def identify_node_outputs(self, inputs, dim):
-        for i, node in enumerate(self.outputs):
+    def identify_node_output(self, inputs, dim):
+        for i, node in enumerate(self.output):
             unmatched = True
+            # Look for the layer output in others input to find the actual output dim
+            # it will match only once, it is assumed that a layer can't produce multiple
+            # usable outputs (other outputs if existed won't be used as input for others)
             for j in inputs:
                 for k in inputs[j]:
                     if node == k:
                         unmatched = False
-                        self.outputs[i] = dim(self.name) + ' ' + j
+                        self.output[i] = dim(self.name)
+            # Remove other unused outputs (as in 'Dropout' layers)
             if unmatched & ("MODEL_OUTPUT" not in node):
-                self.outputs.remove(node)
-                print("Unused output dropped: " + str(node) + " @ " + self.name)
+                self.output.remove(node)
 
-    def save(self, path, extract_parameters=False):
+    def update_graph_node_name(self):
+        self.graph_node.op_type = self.name
+
+    def save(self, path):
         summary = super().__str__() + ":\n"
 
         summary += self.field_to_string(self.attributes, "Attributes:")
@@ -106,12 +127,9 @@ class Node(Property):
             summary += '\t' + "Parameters:" + '\n'
             for i, parameter in enumerate(self.parameters):
                 param_name = self.name + "_" + str(i)
-                if extract_parameters:
-                    param_name += ".param"
-                    self.save_parameter(path, param_name, parameter)
                 summary += "\t\t" + param_name + " '" + str(parameter.dtype) + "': " + str(parameter.shape) + '\n'
 
-        summary += self.field_to_string(self.outputs, "Outputs:")
+        summary += self.field_to_string(self.output, "Output:")
         utils.create_file(path + '/' + self.name + ".node", summary)
 
     @staticmethod
@@ -122,9 +140,3 @@ class Node(Property):
             for element in field:
                 s += "\t\t" + str(element) + '\n'
         return s
-
-    @staticmethod
-    def save_parameter(path, file_name, parameter):
-        import numpy as np
-        np.set_printoptions(threshold=np.inf)
-        utils.create_file(path + '/' + file_name + ".param", str(parameter))
