@@ -10,12 +10,14 @@ from model.onxx_dataflow.graph_properties import Node
 class Graph:
     def __init__(self, path):
         self.path = path
+        self.model = None
         self.onnx_nodes = []
 
     def identify_model_graph(self):
         # Reset node ids for every model
         Node.type_id = {}
 
+        # Note: Different versions or missing operators are beyond our scope
         model = onnx.load(self.path)
         onnx.checker.check_model(model)
 
@@ -51,19 +53,22 @@ class Graph:
         for node in self.onnx_nodes:
             node.update_graph_node_name()
 
-        # TODO: make this safer by saving that model in the output folder
-        # Make sure the replica model is in the project dir
+        # Make sure the replica model is in the output dir
+        self.model = model
         self.path = self.path[self.path.rfind('/') + 1:]
-        onnx.save(model, self.path)
+
         return self.path
 
     def save(self):
         selected_path = utils.choose_folder_dialog('Choose output folder')
         if not selected_path:
             return None
+
         dir_path = selected_path + "/output"
         utils.delete_folder(dir_path)
         utils.create_folder(dir_path)
+
+        onnx.save(self.model, dir_path + '/' + self.path)
 
         for node in self.onnx_nodes:
             node.save(dir_path)

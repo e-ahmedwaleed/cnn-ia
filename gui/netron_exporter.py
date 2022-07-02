@@ -16,7 +16,7 @@ from PyQt5 import QtWebEngineWidgets, QtCore, QtGui, QtWidgets
 
 # noinspection SpellCheckingInspection
 class HiddenNetron(object):
-    def __init__(self, main_window, model, output):
+    def __init__(self, main_window, model):
         main_window.setObjectName("MainWindow")
         main_window.resize(320, 60)
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -27,14 +27,18 @@ class HiddenNetron(object):
         main_window.setMinimumSize(QtCore.QSize(320, 60))
         main_window.setMaximumSize(QtCore.QSize(320, 60))
         icon = QtGui.QIcon()
-        project_dir = __file__.replace("\\gui\\netron_exporter.py", "").replace("\\", "/")
+        project_dir = __file__.replace("\\", "/").replace("/gui/netron_exporter.py", "")
         icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/netron-icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         main_window.setWindowIcon(icon)
 
+        # Disable min/max/close buttons
+        main_window.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+        main_window.setWindowFlag(QtCore.Qt.WindowMinimizeButtonHint, False)
+
         self.model = model
-        self.output = output
+        self.output = model[:model.rfind('/')]
         # Intiate netron within a hidden browser
-        netron.start(model, browse=False)
+        netron.start(self.model, browse=False)
         self.browser = QtWebEngineWidgets.QWebEngineView()
         self.browser.page().profile().downloadRequested.connect(self.on_download_requested)
         self.browser.setUrl(QtCore.QUrl("http://localhost:8080/"))
@@ -48,7 +52,7 @@ class HiddenNetron(object):
         self.progressBar.setProperty("value", 0)
         main_window.setCentralWidget(self.centralwidget)
 
-        main_window.setWindowTitle("Netron Loading")
+        main_window.setWindowTitle("Exporting model graph")
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
     def on_download_requested(self, download):
@@ -59,44 +63,57 @@ class HiddenNetron(object):
         if self.progressBar.value() < 100:
             self.progressBar.setProperty("value", self.progressBar.value() + step)
 
-    def format_netron(self, time_interval):
+    def export_model(self, time_interval):
         # For some reason if the first time to invoke this method
         # is in another thread, the code simply fails
         self.browser.page().runJavaScript('')
 
         # Very nondeterministic manouver but 20 secs is quite enough
         # for the onnnx model to loaded to netron to be exported
-        export = threading.Timer(time_interval * 2, function=self.browser.page().runJavaScript,
-                                 args=('this.__view__.export(document.title + ".png");',))
-        # Delete the replica model since it can no longer be used
-        clean = threading.Timer(time_interval * 2, function=os.remove, args=(self.model,))
-        # Stop the server at the local host by terminating netron
-        terminate = threading.Timer(time_interval * 3, function=netron.stop)
+        threading.Timer(time_interval * 2, function=self.browser.page().runJavaScript,
+                        args=('this.__view__.export(document.title + ".png");',)).start()
 
         # An illousion of some progress
+        step = int(100 / time_interval)
         import random
-        for i in range(time_interval):
-            threading.Timer(i * 4, function=self.increament_progress, args=(random.randint(10, 15),)).start()
-            threading.Timer(i * 4, function=QtCore.QCoreApplication.processEvents).start()
+        for i in range(time_interval + 1):
+            threading.Timer(i * 3, function=self.increament_progress,
+                            args=(random.randint(step - 2, step + 2),)).start()
+            threading.Timer(i * 3, function=QtCore.QCoreApplication.processEvents).start()
 
-        export.start()
-        clean.start()
-        terminate.start()
+        return self.output
+
+
+def terminate(model, output):
+    # Delete the replica model since it can no longer be used
+    if os.path.exists(output + "/model.png"):
+        os.remove(model)
+    # Stop the server at the local host by terminating netron
+    netron.stop()
 
 
 def main():
-    time_interval = 10
+    model_path = ""
+
+    # noinspection PyBroadException
+    try:
+        time_interval = int(sys.argv[-1])
+        for arg in sys.argv[1:-1]:
+            model_path += (' ' + arg)
+        model_path = model_path[1:]
+    except:
+        time_interval = 15
+        model_path = sys.argv[1]
 
     app = QtWidgets.QApplication(sys.argv)
-    # Since this program is nondeterministic this is a timeout
-    terminate = threading.Timer(time_interval * 4, function=app.quit)
-
     window = QtWidgets.QMainWindow()
-    h_n = HiddenNetron(window, sys.argv[1], sys.argv[2])
-
+    h_n = HiddenNetron(window, model_path)
     window.show()
-    h_n.format_netron(time_interval)
-    terminate.start()
+
+    # Since this program is nondeterministic this is a timeout
+    threading.Timer(time_interval * 3, function=terminate, args=(model_path, h_n.export_model(time_interval),)).start()
+    # Has to be initiated in the main thread
+    threading.Timer(time_interval * 4, function=app.quit).start()
 
     sys.exit(app.exec_())
 
