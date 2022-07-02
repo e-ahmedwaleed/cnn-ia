@@ -35,9 +35,8 @@ class GraphDims:
         return dict(zip(outputs, ort_outs))
 
     def __generate_random_input(self, model):
-        # TODO: consider multi-input models such as 'bertsquad-10.onnx'
         # The first element in dims is: input
-        self.dims[''] = self.identify_tensor_dim(model.graph.input)
+        self.dims[''] = tuple(self.identify_tensor_dim(model.graph.input))
         from onnx.mapping import TENSOR_TYPE_TO_NP_TYPE
         data_type = TENSOR_TYPE_TO_NP_TYPE[model.graph.input[0].type.tensor_type.elem_type]
         return np.random.rand(*self.dims['']).astype(data_type)

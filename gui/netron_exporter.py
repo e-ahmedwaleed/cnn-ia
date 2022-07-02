@@ -78,7 +78,7 @@ class HiddenNetron(object):
         import random
         for i in range(time_interval + 1):
             threading.Timer(i * 3, function=self.increament_progress,
-                            args=(random.randint(step - 2, step + 2),)).start()
+                            args=(random.randint(max(0, step - 1), step + 1),)).start()
             threading.Timer(i * 3, function=QtCore.QCoreApplication.processEvents).start()
 
         return self.output
@@ -93,17 +93,8 @@ def terminate(model, output):
 
 
 def main():
-    model_path = ""
-
-    # noinspection PyBroadException
-    try:
-        time_interval = int(sys.argv[-1])
-        for arg in sys.argv[1:-1]:
-            model_path += (' ' + arg)
-        model_path = model_path[1:]
-    except:
-        time_interval = 15
-        model_path = sys.argv[1]
+    model_path = str(sys.argv[1]).replace('*', ' ')
+    time_interval = int(sys.argv[2])
 
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()

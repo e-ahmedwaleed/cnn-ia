@@ -19,12 +19,12 @@ def extract(model_path):
             cmd = "./venv/Scripts/python.exe "
 
         # Try exporting the model images with increasing timeout
+        timeout = 15
         success = False
-        # TODO: consider a config file
-        timeout = 5
-        for i in range(3):
-            # Only singles spaces are handled, multi-spaces RIP
-            utils.run_command(cmd + ' ./gui/netron_exporter.py ' + output_dir + '/' + model_name + ' ' + str(timeout))
+        # Spaces handled properly
+        model_path = (output_dir + '/' + model_name).replace(' ', '*')
+        for i in range(4):
+            utils.run_command(cmd + ' ./gui/netron_exporter.py ' + model_path + ' ' + str(timeout))
             if os.path.exists(output_dir + "/model.png"):
                 success = True
                 break
