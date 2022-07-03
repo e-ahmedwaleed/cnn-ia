@@ -89,9 +89,6 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
                     else:
                         raise
                 i += 1
-    # print(i)
-    # print(exploration_tb)
-    # print()
     if verbose:
         utils.print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
         content, note = me_utils.tabulate_optimal_arch(exploration_tb)
@@ -102,7 +99,6 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
         for index in range(min(mem_levels, len(explore_points), 3)):
             if explore_points[index] != 1:
                 pos.append(index)
-        # print(exploration_tb[2][2])
         memory_report.generate(exploration_tb, pos, arch_info, network_info)
 
     return exploration_tb
