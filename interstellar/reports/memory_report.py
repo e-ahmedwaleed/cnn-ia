@@ -65,7 +65,7 @@ def generate(exploration_tb, pos, arch_info, network_info, output_file="memory_o
     ## Exploration Table
     pdf.set_font('Arial', 'B', c.H1)
     head = []
-    mem_levels = arch_info['mem_levels']
+    # mem_levels = arch_info['mem_levels']
     for index in pos:
         head.append("L" + str(index) + "-SIZE")
         head.append("L" + str(index) + "-COST")

@@ -99,6 +99,7 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
         for index in range(min(mem_levels, len(explore_points), 3)):
             if explore_points[index] != 1:
                 pos.append(index)
+
         memory_report.generate(exploration_tb, pos, arch_info, network_info)
 
     return exploration_tb
