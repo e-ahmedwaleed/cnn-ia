@@ -10,6 +10,7 @@ import reports.basic_report as basic_report
 import reports.memory_report as memory_report
 import reports.dataflow_report as dataflow_report
 
+
 utils.enum_table = cm.loop_enum.table
 
 
@@ -52,36 +53,57 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
     columns = len(arch_info["capacity"]) * 2 + 1
     # Initialize exploration table
     exploration_tb = np.zeros([np.product(explore_points), columns])
-
-    capacity1 = arch_info["capacity"][1]
-    capacity0 = arch_info["capacity"][0]
-    cost1 = arch_info["access_cost"][1]
-    cost0 = arch_info["access_cost"][0]
+    mem_levels = arch_info["mem_levels"]
+    capacities = []
+    costs = []
+    for index in range(mem_levels):
+        capacities.append(arch_info["capacity"][index])
+        costs.append(arch_info["access_cost"][index])
 
     i = 0
-    for y in range(explore_points[1]):
-        arch_info["capacity"][1] = capacity1 * (arch_info["capacity_scale"][1] ** y)
-        arch_info["access_cost"][1] = cost1 * (arch_info["access_cost_scale"][1] ** y)
-        for x in range(explore_points[0]):
-            arch_info["capacity"][0] = capacity0 * (arch_info["capacity_scale"][0] ** x)
-            arch_info["access_cost"][0] = cost0 * (arch_info["access_cost_scale"][0] ** x)
-            try:
-                energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
-                exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [energy]
-            except AssertionError as err:
-                if err.args[0] == "No valid mapping point found.":
-                    exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [float("inf")]
-                else:
-                    raise
-            i += 1
+    ind = 1
+    ind2 = 1
 
+    if mem_levels >= 2:
+        ind2 = explore_points[1]
+    if mem_levels >= 3:
+        ind = explore_points[2]
+
+    for z in range(ind):
+        if mem_levels >= 3:
+            arch_info["capacity"][2] = capacities[2] * (arch_info["capacity_scale"][2] ** z)
+            arch_info["access_cost"][2] = costs[2] * (arch_info["access_cost_scale"][2] ** z)
+        for y in range(ind2):
+            if mem_levels >= 2:
+                arch_info["capacity"][1] = capacities[1] * (arch_info["capacity_scale"][1] ** y)
+                arch_info["access_cost"][1] = costs[1] * (arch_info["access_cost_scale"][1] ** y)
+            for x in range(explore_points[0]):
+                arch_info["capacity"][0] = capacities[0] * (arch_info["capacity_scale"][0] ** x)
+                arch_info["access_cost"][0] = costs[0] * (arch_info["access_cost_scale"][0] ** x)
+                try:
+                    energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
+                    exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [energy]
+                except AssertionError as err:
+                    if err.args[0] == "No valid mapping point found.":
+                        exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [float("inf")]
+                    else:
+                        raise
+                i += 1
+    # print(i)
+    # print(exploration_tb)
+    # print()
     if verbose:
         utils.print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
         content, note = me_utils.tabulate_optimal_arch(exploration_tb)
         utils.print_output("OPTIMAL COST", content, note)
 
     if reports:
-        memory_report.generate(exploration_tb, arch_info, network_info)
+        pos = []
+        for index in range(min(mem_levels, len(explore_points), 3)):
+            if explore_points[index] != 1:
+                pos.append(index)
+        # print(exploration_tb[2][2])
+        memory_report.generate(exploration_tb, pos, arch_info, network_info)
 
     return exploration_tb
 

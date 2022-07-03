@@ -9,6 +9,6 @@
     "parallel_cost":[2],
     "capacity_scale":[2, 2],
     "access_cost_scale":[2, 2],
-    "explore_points":[5, 5], 
+    "explore_points":[5, 5],
     "precision":16
 }
