@@ -25,6 +25,14 @@ def print_output(title, content, note=''):
         print(top + title + bot[:-1])
 
 
+# Revert the capacities to its original input form
+def undo_arch_info_capacity_scale(arch_info):
+    num_bytes = arch_info["precision"] / 8
+    for i in range(len(arch_info["capacity"])):
+        arch_info["capacity"][i] *= num_bytes
+    return arch_info
+
+
 # (1.0, 1.0, ...) -> (1, 1, ...)
 def to_ints(floats_tuple):
     ints_list = []

@@ -1,6 +1,8 @@
 import reports.writer as w
 import reports.constants as c
 
+from verbose.utils import undo_arch_info_capacity_scale
+
 
 def intro_page(title, body, arch_info):
     pdf = w.PDF()
@@ -11,6 +13,7 @@ def intro_page(title, body, arch_info):
     pdf.set_font('Arial', 'B', c.H1)
     pdf.cell(0, 10, title, 1, 0, 'C')
     pdf.ln(c.INTER_MID_NEW_LINE)
+    arch_info = undo_arch_info_capacity_scale(arch_info)
     mem_levels = arch_info['mem_levels']
 
     # Introduction
