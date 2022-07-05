@@ -53,27 +53,59 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
     # Initialize exploration table
     exploration_tb = np.zeros([np.product(explore_points), columns])
 
-    capacity1 = arch_info["capacity"][1]
-    capacity0 = arch_info["capacity"][0]
-    cost1 = arch_info["access_cost"][1]
-    cost0 = arch_info["access_cost"][0]
+    # Read exploration initial state
+    costs = []
+    capacities = []
+    mem_levels = arch_info["mem_levels"]
+    for index in range(mem_levels):
+        capacities.append(arch_info["capacity"][index])
+        costs.append(arch_info["access_cost"][index])
+
+    # Identify number of explorations for each level
+    dims = len(explore_points)
+
+    explore_l1 = 1
+    if mem_levels >= 2:
+        if dims > 1:
+            explore_l1 = explore_points[1]
+        else:
+            explore_points.insert(1, explore_l1)
+
+    explore_l2 = 1
+    if mem_levels >= 3:
+        if dims > 2:
+            explore_l2 = explore_points[2]
+        else:
+            explore_points.insert(2, explore_l2)
 
     i = 0
-    for y in range(explore_points[1]):
-        arch_info["capacity"][1] = capacity1 * (arch_info["capacity_scale"][1] ** y)
-        arch_info["access_cost"][1] = cost1 * (arch_info["access_cost_scale"][1] ** y)
-        for x in range(explore_points[0]):
-            arch_info["capacity"][0] = capacity0 * (arch_info["capacity_scale"][0] ** x)
-            arch_info["access_cost"][0] = cost0 * (arch_info["access_cost_scale"][0] ** x)
-            try:
-                energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
-                exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [energy]
-            except AssertionError as err:
-                if err.args[0] == "No valid mapping point found.":
-                    exploration_tb[i] = arch_info["capacity"] + arch_info["access_cost"] + [float("inf")]
-                else:
-                    raise
-            i += 1
+    for z in range(explore_l2):
+        if (mem_levels >= 3) & (dims > 2):
+            arch_info["capacity"][2] = capacities[2] * (arch_info["capacity_scale"][2] ** z)
+            arch_info["access_cost"][2] = costs[2] * (arch_info["access_cost_scale"][2] ** z)
+        for y in range(explore_l1):
+            if (mem_levels >= 2) & (dims > 1):
+                arch_info["capacity"][1] = capacities[1] * (arch_info["capacity_scale"][1] ** y)
+                arch_info["access_cost"][1] = costs[1] * (arch_info["access_cost_scale"][1] ** y)
+            for x in range(explore_points[0]):
+                arch_info["capacity"][0] = capacities[0] * (arch_info["capacity_scale"][0] ** x)
+                arch_info["access_cost"][0] = costs[0] * (arch_info["access_cost_scale"][0] ** x)
+
+                # Revert the capacities to its original input form
+                original_capacity = []
+                num_bytes = arch_info["precision"] / 8
+                for capacity in arch_info["capacity"]:
+                    original_capacity.append(num_bytes * capacity)
+
+                try:
+                    energy = basic_optimizer(arch_info, network_info, schedule_info)[0]
+                    exploration_tb[i] = original_capacity + arch_info["access_cost"] + [energy]
+                except AssertionError as err:
+                    if err.args[0] == "No valid mapping point found.":
+                        exploration_tb[i] = original_capacity + arch_info["access_cost"] + [float("inf")]
+                    else:
+                        raise
+                i += 1
 
     if verbose:
         utils.print_output("EXPLORATION TABLE", me_utils.tabulate_exploration_table(exploration_tb))
@@ -81,7 +113,12 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
         utils.print_output("OPTIMAL COST", content, note)
 
     if reports:
-        memory_report.generate(exploration_tb, arch_info, network_info)
+        explored = []
+        for index in range(min(dims, mem_levels, 3)):
+            if explore_points[index] != 1:
+                explored.append(index)
+
+        memory_report.generate(exploration_tb, explored, arch_info, network_info)
 
     return exploration_tb
 
