@@ -45,4 +45,3 @@ class ParametersExtractor(object):
 
     def set_status(self, status):
         self.statusbar.showMessage(status)
-        self.statusbar.setStatusTip(status)

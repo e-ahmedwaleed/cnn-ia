@@ -21,9 +21,7 @@ def extract(model_path):
         # Spaces handled properly
         model_path = (output_dir + '/' + model_name).replace(' ', '*')
 
-        # TODO: timeout will be no longer needed
-        timeout = 10
-        utils.run_command(cmd + ' ./gui/export/netron_exporter.py ' + model_path + ' ' + str(timeout))
+        utils.run_command(cmd + ' ./gui/export/model_exporter_gui.py ' + model_path)
 
         # Open output folder in the explorer
         if os.path.exists(output_dir + "/model.png"):
