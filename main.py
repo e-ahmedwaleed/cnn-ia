@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5 import QtWidgets
-from gui.parameters_extractor import ParametersExtractor, ParametersExtractorGUI
+from gui.extract.parameters_extractor import ParametersExtractor, ParametersExtractorGUI
 
 app = QtWidgets.QApplication(sys.argv)
 window = QtWidgets.QMainWindow()

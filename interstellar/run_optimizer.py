@@ -2,10 +2,12 @@ import time
 import argparse
 import numpy as np
 import mapping as cm
+
 import verbose.utils as utils
-import verbose.dataflow as df_utils
 import verbose.loop_blocking as lb_utils
 import verbose.memory_explore as me_utils
+import verbose.dataflow_explore as df_utils
+
 import reports.basic_report as basic_report
 import reports.memory_report as memory_report
 import reports.dataflow_report as dataflow_report
