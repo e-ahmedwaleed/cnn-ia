@@ -10,8 +10,11 @@ def extract(model_path):
         output_dir = dataflow.save()
         if output_dir is None:
             raise Exception('Model Extraction Canceled.')
+
         # Spaces handled properly
         model_path = (output_dir + '/' + model_name).replace(' ', '*')
-        return utils.run_subprocess('./gui/export/model_exporter.py ' + model_path)
+        proc = utils.run_subprocess('./gui/export/model_exporter.py ' + model_path)
+
+        return proc, output_dir + "/model.png"
     except:
-        return None
+        return None, None

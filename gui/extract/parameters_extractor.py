@@ -1,8 +1,8 @@
 import os
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+from PyQt5.QtWidgets import QApplication as QApp
 
 from gui import utils
+from model import extract_model
 from gui.extract.parameters_extractor_gui import ParametersExtractorGUI
 
 
@@ -15,7 +15,6 @@ class ParametersExtractor(object):
         self.browseButton = p_e_gui.browseButton
 
         self.modelLibrary = p_e_gui.modelLibrary
-        self.modelLibrary.setEnabled(False)
 
         self.extractButton = p_e_gui.extractButton
 
@@ -36,12 +35,15 @@ class ParametersExtractor(object):
         self.set_status("Model library was changed to " + self.modelLibrary.currentText() + ".")
 
     def extract_model_parameters(self):
-        from model import extract_model
-        exporter = extract_model.extract(self.selected_path)
+        exporter, output = extract_model.extract(self.selected_path)
         if exporter:
+            self.statusbar.parentWidget().hide()
             exporter.wait()
-            from PyQt5.QtWidgets import QApplication
-            QApplication.quit()
+            if os.path.exists(output):
+                QApp.quit()
+            else:
+                self.statusbar.parentWidget().show()
+                self.set_status("Model Exportation Canceled.")
         else:
             self.set_status("Model Extraction Canceled.")
 

@@ -26,7 +26,7 @@ class ModelExporter(object):
 
     def update_state(self, state):
         if state == '0':
-            self.statusLabel.setText("10")
+            self.statusLabel.setText("Please accept netron cookies to continue.")
         elif state == '1':
             self.statusLabel.setText("Model is ready to be exported")
             self.nextButton.setText("Export")
@@ -36,6 +36,10 @@ class ModelExporter(object):
             self.browser.page().runJavaScript('this.document.getElementById("edge-labels").remove();')
             self.browser.page().runJavaScript('this.document.getElementById("nodes").style.pointerEvents = "none";')
             self.browser.setEnabled(True)
+            # self.nextButton.deleteLater()
+            # self.nextButton = None
+        else:
+            self.statusLabel.setText("Please wait...")
 
     def on_download_requested(self, download):
         download.setPath(self.output + "/model.png")
