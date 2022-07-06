@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 main_dir_path = os.path.dirname(os.path.abspath("main.py")).replace("\\", "/")
 
@@ -9,11 +10,19 @@ def sleep(_seconds):
 
 
 def run_command(_cmd):
-    import subprocess
     proc = subprocess.run(_cmd.split(), capture_output=True)
     print(proc.stdout.decode('ascii'))
     print(proc.stderr.decode('ascii'))
     return proc
+
+
+def run_subprocess(_args):
+    cmd = "python "
+    if os.path.exists("./venv/Scripts/python.exe"):
+        cmd = "./venv/Scripts/python.exe "
+
+    cmd += _args
+    return subprocess.Popen(cmd.split())
 
 
 def create_file(_path, _content):
@@ -23,17 +32,11 @@ def create_file(_path, _content):
 
 
 def create_folder(_path):
-    import os
     try:
         os.mkdir(_path)
         return True
     except OSError:
         return False
-
-
-def open_folder(_path):
-    import subprocess
-    subprocess.Popen(r'explorer /select,"' + str(_path).replace('/', '\\') + '"')
 
 
 def delete_folder(_path):

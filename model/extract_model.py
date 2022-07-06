@@ -13,21 +13,10 @@ def extract(model_path):
         if output_dir is None:
             raise Exception('Model Extraction Canceled.')
 
-        # Modules might not be detected when using 'python' while having 'venv'
-        cmd = "python "
-        if os.path.exists("./venv/Scripts/python.exe"):
-            cmd = "./venv/Scripts/python.exe "
-
         # Spaces handled properly
         model_path = (output_dir + '/' + model_name).replace(' ', '*')
-
-        utils.run_command(cmd + ' ./gui/export/model_exporter_gui.py ' + model_path)
-
-        # Open output folder in the explorer
-        if os.path.exists(output_dir + "/model.png"):
-            utils.open_folder(output_dir + "/model.png")
-        else:
-            raise Exception('Model Exportation Canceled.')
+        # TODO: the process is now asynchronous, consider killing if needed later
+        utils.run_subprocess('./gui/export/model_exporter.py ' + model_path)
 
         return "Model Extracted Successfully."
     except Exception as e:

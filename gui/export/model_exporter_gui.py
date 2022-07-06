@@ -24,7 +24,7 @@ class ModelExporterGUI(object):
         icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/netron-icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         main_window.setWindowIcon(icon)
 
-        self.centralwidget = QtWidgets.QWidget(window)
+        self.centralwidget = QtWidgets.QWidget(main_window)
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
 
         self.browser = QtWebEngineWidgets.QWebEngineView(self.centralwidget)
@@ -42,7 +42,7 @@ class ModelExporterGUI(object):
         # self.exportButton.setEnabled(False)
         self.gridLayout.addWidget(self.exportButton, 1, 1, 1, 1)
 
-        window.setCentralWidget(self.centralwidget)
+        main_window.setCentralWidget(self.centralwidget)
 
         self.set_text(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
@@ -54,21 +54,3 @@ class ModelExporterGUI(object):
     def attach_functionality(self, m_e):
         self.exportButton.clicked.connect(m_e.export_model)
         self.browser.page().profile().downloadRequested.connect(m_e.on_download_requested)
-
-
-if __name__ == "__main__":
-    import sys
-    import netron
-    from gui.export.model_exporter import ModelExporter
-
-    app = QtWidgets.QApplication(sys.argv)
-    app.aboutToQuit.connect(netron.stop)
-    window = QtWidgets.QMainWindow()
-
-    gui = ModelExporterGUI(window)
-    me_ = ModelExporter(str(sys.argv[1]).replace('*', ' '), gui)
-    gui.attach_functionality(me_)
-
-    window.show()
-    # TODO: find someway to kill this thing ...
-    sys.exit(app.exec_())

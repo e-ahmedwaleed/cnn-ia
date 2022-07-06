@@ -8,18 +8,18 @@ from gui.extract.parameters_extractor_gui import ParametersExtractorGUI
 
 class ParametersExtractor(object):
 
-    def __init__(self, gui: ParametersExtractorGUI):
-        gui.add_supported_libraries([])  # "PyTorch", "TensorFlow"
+    def __init__(self, p_e_gui: ParametersExtractorGUI):
+        p_e_gui.add_supported_libraries([])  # "PyTorch", "TensorFlow"
 
-        self.modelLocation = gui.modelLocation
-        self.browseButton = gui.browseButton
+        self.modelLocation = p_e_gui.modelLocation
+        self.browseButton = p_e_gui.browseButton
 
-        self.modelLibrary = gui.modelLibrary
+        self.modelLibrary = p_e_gui.modelLibrary
         self.modelLibrary.setEnabled(False)
 
-        self.extractButton = gui.extractButton
+        self.extractButton = p_e_gui.extractButton
 
-        self.statusbar = gui.statusbar
+        self.statusbar = p_e_gui.statusbar
 
         self.modelLocation.setText(utils.main_dir_path)
         self.selected_path = utils.main_dir_path
