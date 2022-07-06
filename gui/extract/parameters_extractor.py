@@ -37,11 +37,13 @@ class ParametersExtractor(object):
 
     def extract_model_parameters(self):
         from model import extract_model
-        status = extract_model.extract(self.selected_path)
-        self.set_status(status)
-        # Update status right now
-        from PyQt5 import QtCore
-        QtCore.QCoreApplication.processEvents()
+        exporter = extract_model.extract(self.selected_path)
+        if exporter:
+            exporter.wait()
+            from PyQt5.QtWidgets import QApplication
+            QApplication.quit()
+        else:
+            self.set_status("Model Extraction Canceled.")
 
     def set_status(self, status):
         self.statusbar.showMessage(status)
