@@ -13,17 +13,20 @@ from PyQt5 import QtWebEngineWidgets, QtCore, QtGui, QtWidgets
 # noinspection SpellCheckingInspection
 class ModelExporterGUI(object):
     def __init__(self, main_window):
-        main_window.resize(800, 600)
+        main_window.resize(640, 480)
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
         size_policy.setHeightForWidth(main_window.sizePolicy().hasHeightForWidth())
         main_window.setSizePolicy(size_policy)
-        main_window.setMinimumSize(QtCore.QSize(800, 600))
+        main_window.setMinimumSize(QtCore.QSize(640, 480))
+        main_window.setMaximumSize(QtCore.QSize(640, 480))
         icon = QtGui.QIcon()
         project_dir = __file__.replace("\\", "/").replace("/gui/export/model_exporter_gui.py", "")
         icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/netron-icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         main_window.setWindowIcon(icon)
+
+        main_window.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
 
         self.centralwidget = QtWidgets.QWidget(main_window)
         self.centralwidget.setAutoFillBackground(True)
@@ -49,22 +52,6 @@ class ModelExporterGUI(object):
     def set_text(self, main_window):
         main_window.setWindowTitle("Model Preview")
         self.nextButton.setText("Check")
-
-    def clean_preview(self):
-        main_window = self.centralwidget.parent()
-
-        self.gridLayout.removeWidget(self.nextButton)
-        self.nextButton.deleteLater()
-        self.nextButton = None
-        self.gridLayout.removeWidget(self.statusLabel)
-        self.statusLabel.deleteLater()
-        self.statusLabel = None
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-
-        QtCore.QCoreApplication.processEvents()
-        main_window.ready = True
-        main_window.hide()
-        return main_window
 
     def attach_functionality(self, m_e):
         self.nextButton.clicked.connect(m_e.check_state)

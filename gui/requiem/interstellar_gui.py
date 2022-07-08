@@ -12,16 +12,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 # noinspection SpellCheckingInspection
 class InterstellarGUI(object):
-    def __init__(self, main_window, model_preview):
-        self.model_preview = model_preview
-
-        main_window.resize(400, 300)
+    def __init__(self, main_window, browser):
+        main_window.resize(480, 640)
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         size_policy.setHorizontalStretch(0)
         size_policy.setVerticalStretch(0)
         size_policy.setHeightForWidth(main_window.sizePolicy().hasHeightForWidth())
         main_window.setSizePolicy(size_policy)
-        main_window.setMinimumSize(QtCore.QSize(400, 300))
+        main_window.setMinimumSize(QtCore.QSize(480, 640))
         icon = QtGui.QIcon()
         project_dir = __file__.replace("\\", "/").replace("/gui/requiem/interstellar_gui.py", "")
         icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/stand-arrow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -31,18 +29,8 @@ class InterstellarGUI(object):
         self.centralwidget.setAutoFillBackground(True)
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
 
-        self.button = QtWidgets.QPushButton(self.centralwidget)
-        self.button.setText("THIS IS REQUIEM!")
-        self.gridLayout.addWidget(self.button, 0, 0, 0, 0)
+        self.gridLayout.addWidget(browser, 0, 0, 0, 0)
 
         main_window.setCentralWidget(self.centralwidget)
         main_window.setWindowTitle("Inference Analyzer")
         main_window.show()
-
-        self.button.clicked.connect(self.launch_model_preview)
-
-    def launch_model_preview(self):
-        self.model_preview.show()
-        self.model_preview.raise_()
-        self.model_preview.activateWindow()
-        self.model_preview.setWindowState(QtCore.Qt.WindowNoState)

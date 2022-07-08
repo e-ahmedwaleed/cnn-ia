@@ -9,7 +9,6 @@
 import netron
 from PyQt5 import QtCore, QtWidgets
 
-from gui.requiem.main_windows import MainWindow
 from gui.requiem.interstellar_gui import InterstellarGUI
 from gui.export.model_exporter_gui import ModelExporterGUI
 
@@ -29,7 +28,6 @@ class ModelExporter(object):
 
         self.requiem = None
         self.requiem_gui = None
-        self.clean_preview = m_e_gui.clean_preview
 
     def update_state(self, state):
         if state == '0':
@@ -43,7 +41,7 @@ class ModelExporter(object):
             self.browser.page().runJavaScript('this.document.getElementById("nodes").style.pointerEvents = "none";')
             self.browser.setEnabled(True)
         else:
-            self.statusLabel.setText("Please wait...")
+            self.statusLabel.setText("Please wait... (check after the model is loaded)")
 
     def on_download_requested(self, download):
         download.setPath(self.output + "/model.png")
@@ -56,21 +54,21 @@ class ModelExporter(object):
                                           ' "1":"";', self.update_state)
 
     def launch_requiem(self):
+        # Hide Model preview window
+        self.browser.parent().parent().hide()
         # Having a reference to the window and gui is mandatory for them to work properly
-        main = self.clean_preview()
-        self.requiem = MainWindow(main)
-        self.requiem_gui = InterstellarGUI(self.requiem, main)
+        self.requiem = QtWidgets.QMainWindow()
+        self.requiem_gui = InterstellarGUI(self.requiem, self.browser)
         self.browser.page().runJavaScript('this.__view__.export(document.title + ".png");')
 
 
 if __name__ == "__main__":
     import sys
-    from gui.requiem.main_windows import ModelPreview
 
     app = QtWidgets.QApplication(sys.argv)
     # TODO: this is not enough
     app.aboutToQuit.connect(netron.stop)
-    window = ModelPreview()
+    window = QtWidgets.QMainWindow()
 
     gui = ModelExporterGUI(window)
     m_e = ModelExporter(str(sys.argv[1]).replace('*', ' '), gui)
