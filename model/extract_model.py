@@ -15,6 +15,6 @@ def extract(model_path):
         model_path = (output_dir + '/' + model_name).replace(' ', '*')
         proc = utils.run_subprocess('./gui/export/model_exporter.py ' + model_path)
 
-        return proc, output_dir + "/model.png"
+        return proc
     except:
-        return None, None
+        return None

@@ -50,6 +50,21 @@ class ModelExporterGUI(object):
         main_window.setWindowTitle("Model Preview")
         self.nextButton.setText("Check")
 
+    def clean_preview(self):
+        main_window = self.centralwidget.parent()
+        main_window.hide()
+
+        self.gridLayout.removeWidget(self.nextButton)
+        self.nextButton.deleteLater()
+        self.nextButton = None
+        self.gridLayout.removeWidget(self.statusLabel)
+        self.statusLabel.deleteLater()
+        self.statusLabel = None
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+
+        main_window.ready = True
+        return main_window
+
     def attach_functionality(self, m_e):
         self.nextButton.clicked.connect(m_e.check_state)
         self.browser.page().profile().downloadRequested.connect(m_e.on_download_requested)

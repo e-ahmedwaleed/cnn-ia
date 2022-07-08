@@ -35,15 +35,11 @@ class ParametersExtractor(object):
         self.set_status("Model library was changed to " + self.modelLibrary.currentText() + ".")
 
     def extract_model_parameters(self):
-        exporter, output = extract_model.extract(self.selected_path)
+        exporter = extract_model.extract(self.selected_path)
         if exporter:
             self.statusbar.parentWidget().hide()
             exporter.wait()
-            if os.path.exists(output):
-                QApp.quit()
-            else:
-                self.statusbar.parentWidget().show()
-                self.set_status("Model Exportation Canceled.")
+            QApp.quit()
         else:
             self.set_status("Model Extraction Canceled.")
 
