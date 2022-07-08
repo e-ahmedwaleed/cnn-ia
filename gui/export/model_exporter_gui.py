@@ -52,7 +52,6 @@ class ModelExporterGUI(object):
 
     def clean_preview(self):
         main_window = self.centralwidget.parent()
-        main_window.hide()
 
         self.gridLayout.removeWidget(self.nextButton)
         self.nextButton.deleteLater()
@@ -62,7 +61,9 @@ class ModelExporterGUI(object):
         self.statusLabel = None
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
 
+        QtCore.QCoreApplication.processEvents()
         main_window.ready = True
+        main_window.hide()
         return main_window
 
     def attach_functionality(self, m_e):

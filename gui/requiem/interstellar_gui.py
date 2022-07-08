@@ -12,8 +12,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 # noinspection SpellCheckingInspection
 class InterstellarGUI(object):
-    def __init__(self, main_window):
-        self.model_preview = main_window.parent
+    def __init__(self, main_window, model_preview):
+        self.model_preview = model_preview
 
         main_window.resize(400, 300)
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -31,11 +31,18 @@ class InterstellarGUI(object):
         self.centralwidget.setAutoFillBackground(True)
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
 
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setText("THIS IS REQUIEM!")
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.gridLayout.addWidget(self.label, 0, 0, 0, 0)
+        self.button = QtWidgets.QPushButton(self.centralwidget)
+        self.button.setText("THIS IS REQUIEM!")
+        self.gridLayout.addWidget(self.button, 0, 0, 0, 0)
 
         main_window.setCentralWidget(self.centralwidget)
         main_window.setWindowTitle("Inference Analyzer")
         main_window.show()
+
+        self.button.clicked.connect(self.launch_model_preview)
+
+    def launch_model_preview(self):
+        self.model_preview.show()
+        self.model_preview.raise_()
+        self.model_preview.activateWindow()
+        self.model_preview.setWindowState(QtCore.Qt.WindowNoState)

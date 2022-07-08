@@ -9,8 +9,9 @@
 import netron
 from PyQt5 import QtCore, QtWidgets
 
-from gui.export.model_exporter_gui import ModelExporterGUI
+from gui.requiem.main_windows import MainWindow
 from gui.requiem.interstellar_gui import InterstellarGUI
+from gui.export.model_exporter_gui import ModelExporterGUI
 
 
 class ModelExporter(object):
@@ -25,6 +26,9 @@ class ModelExporter(object):
 
         self.nextButton = m_e_gui.nextButton
         self.statusLabel = m_e_gui.statusLabel
+
+        self.requiem = None
+        self.requiem_gui = None
         self.clean_preview = m_e_gui.clean_preview
 
     def update_state(self, state):
@@ -52,28 +56,19 @@ class ModelExporter(object):
                                           ' "1":"";', self.update_state)
 
     def launch_requiem(self):
-        InterstellarGUI(QtWidgets.QMainWindow(self.clean_preview()))
+        # Having a reference to the window and gui is mandatory for them to work properly
+        main = self.clean_preview()
+        self.requiem = MainWindow(main)
+        self.requiem_gui = InterstellarGUI(self.requiem, main)
         self.browser.page().runJavaScript('this.__view__.export(document.title + ".png");')
-
-
-class ModelPreview(QtWidgets.QMainWindow):
-
-    def __init__(self):
-        self.ready = False
-        super().__init__()
-
-    def closeEvent(self, event):
-        if self.ready:
-            self.hide()
-            event.ignore()
-        else:
-            event.accept()
 
 
 if __name__ == "__main__":
     import sys
+    from gui.requiem.main_windows import ModelPreview
 
     app = QtWidgets.QApplication(sys.argv)
+    # TODO: this is not enough
     app.aboutToQuit.connect(netron.stop)
     window = ModelPreview()
 
