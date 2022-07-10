@@ -146,7 +146,7 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     return dataflow_tb
 
 
-# TODO: more to be done for reports when gui is ready
+# TODO: more to be done for reports when gui is ready (custom save path instead of flag)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("type", choices=["basic", "mem_explore", "dataflow_explore"], help="optimizer type")
@@ -159,6 +159,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     start = time.time()
+    # TODO: find a way to import this considering 2elly_yeraya7ak
     i_arch_info, i_network_info, i_schedule_info = cm.extract_input.extract_info(args)
     if args.type == "basic":
         basic_optimizer(i_arch_info, i_network_info, i_schedule_info, args.verbose, args.report)

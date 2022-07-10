@@ -67,7 +67,7 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    # TODO: this is not enough
+    # TODO: this is not enough, fix it or kill it
     app.aboutToQuit.connect(netron.stop)
     window = QtWidgets.QMainWindow()
 

@@ -8,6 +8,7 @@ from gui.extract.parameters_extractor_gui import ParametersExtractorGUI
 class ParametersExtractor(object):
 
     def __init__(self, p_e_gui: ParametersExtractorGUI):
+        # TODO: support more libraries
         p_e_gui.add_supported_libraries([])  # "PyTorch", "TensorFlow"
 
         self.modelLocation = p_e_gui.modelLocation
@@ -29,6 +30,7 @@ class ParametersExtractor(object):
             self.selected_path = selected_path
             self.modelLocation.setText(self.selected_path)
 
+    # TODO : delete if no more are supported
     def model_library_changed(self):
         self.modelLocation.setText(utils.main_dir_path)
         self.set_status("Model library was changed to " + self.modelLibrary.currentText() + ".")

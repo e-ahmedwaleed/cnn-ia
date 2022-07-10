@@ -1,3 +1,4 @@
+# TODO: check for dependencies here and make unnecessary ones local
 import sys
 
 from PyQt5 import QtWidgets

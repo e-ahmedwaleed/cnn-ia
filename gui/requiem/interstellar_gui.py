@@ -10,6 +10,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
+# TODO: include loop blocking and memory exploration
 # noinspection SpellCheckingInspection
 class InterstellarGUI(object):
     def __init__(self, main_window, browser):
