@@ -1,4 +1,3 @@
-import os
 from PyQt5.QtWidgets import QApplication as QApp
 
 from gui import utils

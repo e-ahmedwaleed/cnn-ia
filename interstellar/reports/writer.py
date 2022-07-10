@@ -259,7 +259,8 @@ def to_mem_arch(arch, pdf):
     # write caches
     make_table(rows_mem, list(mem_list.values()), pdf)
 
-    pdf.line(20, 130, (30 * (mem_levels + 1)) + 20, 130)
+    pdf.line(20, 74 + (c.HEIGHT_MARGIN * (len(mem_list) + 1)), (c.WIDTH_MARGIN * (mem_levels + 1)) + 20,
+             74 + (c.HEIGHT_MARGIN * (len(mem_list) + 1)))
     # write status as a key : value
     write_key_value(rows_status, list(status_list.values()), pdf, 60)
     pdf.set_font('Arial', 'B', c.H1)

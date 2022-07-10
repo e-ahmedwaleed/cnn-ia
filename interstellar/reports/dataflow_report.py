@@ -2,7 +2,7 @@ import reports.writer as w
 import reports.constants as c
 
 from reports.basic_report import intro_page
-from verbose.dataflow import find_best_schedules
+from verbose.dataflow_explore import find_best_schedules
 from verbose.utils import identify_loops_in_brackets_str
 
 

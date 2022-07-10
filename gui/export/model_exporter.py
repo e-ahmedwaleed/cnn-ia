@@ -38,6 +38,7 @@ class ModelExporter(object):
             self.nextButton.clicked.connect(self.launch_requiem)
             self.nextButton.clicked.disconnect(self.check_state)
             self.browser.page().runJavaScript('this.document.getElementById("menu-button").remove();')
+            self.browser.page().runJavaScript('this.document.getElementById("zoom-out-button").click();')
             self.browser.page().runJavaScript('this.document.getElementById("nodes").style.pointerEvents = "none";')
             self.browser.setEnabled(True)
         else:
