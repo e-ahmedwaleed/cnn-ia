@@ -18,6 +18,7 @@ class ModelExporter(object):
         self.model = model_path
         self.output = model_path[:model_path.rfind('/')]
 
+        self.cookies = False
         self.browser = m_e_gui.browser
 
         netron.start(self.model, browse=False)
@@ -31,6 +32,8 @@ class ModelExporter(object):
 
     def update_state(self, state):
         if state == '0':
+            self.cookies = True
+            self.browser.setEnabled(True)
             self.statusLabel.setText("Please accept netron cookies to continue.")
         elif state == '1':
             self.statusLabel.setText("Model is ready to be exported")
@@ -42,7 +45,10 @@ class ModelExporter(object):
             self.browser.page().runJavaScript('this.document.getElementById("nodes").style.pointerEvents = "none";')
             self.browser.setEnabled(True)
         else:
-            self.statusLabel.setText("Please wait... (check after the model is loaded)")
+            if not self.cookies:
+                self.statusLabel.setText("Please wait... (check after the model is loaded)")
+                self.browser.setEnabled(False)
+            self.cookies = False
 
     def on_download_requested(self, download):
         download.setPath(self.output + "/model.png")
@@ -61,19 +67,3 @@ class ModelExporter(object):
         self.requiem = QtWidgets.QMainWindow()
         self.requiem_gui = InterstellarGUI(self.requiem, self.browser)
         self.browser.page().runJavaScript('this.__view__.export(document.title + ".png");')
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    # TODO: this is not enough, fix it or kill it
-    app.aboutToQuit.connect(netron.stop)
-    window = QtWidgets.QMainWindow()
-
-    gui = ModelExporterGUI(window)
-    m_e = ModelExporter(str(sys.argv[1]).replace('*', ' '), gui)
-    gui.attach_functionality(m_e)
-
-    window.show()
-    sys.exit(app.exec_())

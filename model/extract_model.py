@@ -14,7 +14,7 @@ def extract(model_path):
         # Spaces handled properly
         # TODO: if you were to kill it, consider this
         model_path = (output_dir + '/' + model_name).replace(' ', '*')
-        proc = utils.run_subprocess('./gui/export/model_exporter.py ' + model_path)
+        proc = utils.run_subprocess('./main.py ' + model_path)
 
         return proc
     except:
