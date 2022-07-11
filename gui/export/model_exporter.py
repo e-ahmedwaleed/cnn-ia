@@ -21,14 +21,18 @@ class ModelExporter(object):
         self.cookies = False
         self.browser = m_e_gui.browser
 
-        netron.start(self.model, browse=False)
-        self.browser.setUrl(QtCore.QUrl("http://localhost:8080/"))
+        # TODO: DEBUG
+        # netron.start(self.model, browse=False)
+        # self.browser.setUrl(QtCore.QUrl("http://localhost:8080/"))
 
         self.nextButton = m_e_gui.nextButton
         self.statusLabel = m_e_gui.statusLabel
 
         self.requiem = None
         self.requiem_gui = None
+
+        # TODO: DEBUG
+        self.launch_requiem()
 
     def update_state(self, state):
         if state == '0':
@@ -65,5 +69,5 @@ class ModelExporter(object):
         self.browser.parent().parent().hide()
         # Having a reference to the window and gui is mandatory for them to work properly
         self.requiem = QtWidgets.QMainWindow()
-        self.requiem_gui = InterstellarGUI(self.requiem, self.browser)
+        self.requiem_gui = InterstellarGUI(self.requiem, self.browser, self.output)
         self.browser.page().runJavaScript('this.__view__.export(document.title + ".png");')

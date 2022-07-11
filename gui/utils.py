@@ -28,6 +28,11 @@ def run_subprocess(_args):
     return subprocess.Popen(cmd.split())
 
 
+def list_files(_dir):
+    (_, _, files) = next(os.walk(_dir))
+    return files
+
+
 def create_file(_path, _content):
     file = open(_path, "w")
     file.write(_content)

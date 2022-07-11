@@ -24,5 +24,6 @@ else:
     p_e = ParametersExtractor(gui)
     gui.attach_functionality(p_e)
 
-window.show()
+# TODO: DEBUG
+# window.show()
 sys.exit(app.exec_())
