@@ -48,6 +48,8 @@ class ParametersExtractorGUI(object):
         self.set_text(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
+        main_window.show()
+
     def set_text(self, main_window):
         _translate = QtCore.QCoreApplication.translate
         main_window.setWindowTitle("Parameters Extractor")
@@ -57,10 +59,7 @@ class ParametersExtractorGUI(object):
         self.extractButton.setText("Extract Parameters")
 
     def add_supported_libraries(self, libraries):
-        self.modelLibrary.addItem("")
-        self.modelLibrary.setItemText(0, "ONNX")
-
-        i = 1
+        i = 0
         for lib in libraries:
             self.modelLibrary.addItem("")
             self.modelLibrary.setItemText(i, lib)

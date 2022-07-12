@@ -11,10 +11,11 @@
     - onnx==1.10.2
     - onnxruntime==1.11.1
     - PyQt5==5.15.7
+    - tf2onnx==1.9.3
 
 ```sh
 python -m pip install --upgrade pip
-python -m pip install PyQt5 PyQtWebEngine onnx onnxruntime netron numpy fpdf
+python -m pip install PyQt5 PyQtWebEngine numpy onnx onnxruntime netron tf2onnx fpdf
 ```
 
 > :warning: **Do not touch the master branch**: just don't!

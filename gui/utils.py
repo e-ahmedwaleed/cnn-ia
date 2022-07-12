@@ -12,14 +12,19 @@ def sleep(_seconds):
     time.sleep(_seconds)
 
 
-def run_command(_cmd):
-    proc = subprocess.run(_cmd.split(), capture_output=True)
+def run_python(_args):
+    cmd = "python "
+    if os.path.exists("./venv/Scripts/python.exe"):
+        cmd = "./venv/Scripts/python.exe "
+
+    cmd += _args
+    proc = subprocess.run(cmd.split(), capture_output=True)
     print(proc.stdout.decode('ascii'))
     print(proc.stderr.decode('ascii'))
     return proc
 
 
-def run_subprocess(_args):
+def run_python_subprocess(_args):
     cmd = "python "
     if os.path.exists("./venv/Scripts/python.exe"):
         cmd = "./venv/Scripts/python.exe "

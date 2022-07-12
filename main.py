@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 
 # QtWebEngineWidgets must be imported before a QCoreApplication instance is created
 if len(sys.argv) > 1:
+    # D:/Code/PyCharm/cnn-eia/output/CNN-PyTorch-mnist.onnx
     import netron
     from gui.export.model_exporter import ModelExporter, ModelExporterGUI
 
@@ -24,6 +25,4 @@ else:
     p_e = ParametersExtractor(gui)
     gui.attach_functionality(p_e)
 
-# TODO: DEBUG
-# window.show()
 sys.exit(app.exec_())

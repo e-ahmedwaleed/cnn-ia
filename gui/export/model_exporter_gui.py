@@ -49,6 +49,8 @@ class ModelExporterGUI(object):
         self.set_text(main_window)
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
+        main_window.show()
+
     def set_text(self, main_window):
         main_window.setWindowTitle("Model Preview")
         self.nextButton.setText("Check")
