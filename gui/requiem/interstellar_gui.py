@@ -106,12 +106,12 @@ class InterstellarGUI(object):
         self.precision.setProperty("value", 16)
         self.precision.setAccelerated(True)
 
-        self.utilization_threshould = QtWidgets.QSpinBox(self.memory_arch_group)
-        self.utilization_threshould.setGeometry(QtCore.QRect(195, 230, 46, 21))
-        self.utilization_threshould.setMaximum(100)
-        self.utilization_threshould.setAccelerated(True)
-        self.utilization_threshould_label = QtWidgets.QLabel(self.memory_arch_group)
-        self.utilization_threshould_label.setGeometry(QtCore.QRect(100, 230, 91, 21))
+        self.utilization_threshold = QtWidgets.QSpinBox(self.memory_arch_group)
+        self.utilization_threshold.setGeometry(QtCore.QRect(195, 230, 46, 21))
+        self.utilization_threshold.setMaximum(100)
+        self.utilization_threshold.setAccelerated(True)
+        self.utilization_threshold_label = QtWidgets.QLabel(self.memory_arch_group)
+        self.utilization_threshold_label.setGeometry(QtCore.QRect(100, 230, 91, 21))
 
         self.parallel_cost = QtWidgets.QLineEdit(self.memory_arch_group)
         self.parallel_cost.setGeometry(QtCore.QRect(385, 230, 46, 21))
@@ -203,9 +203,9 @@ class InterstellarGUI(object):
             self.add_memory_arch_table_row()
         self.precision.setSuffix(" bit(s)")
         self.precision.setToolTip("Number of bits (precision)")
-        self.utilization_threshould_label.setText("Minimum utilization:")
-        self.utilization_threshould.setSuffix("%")
-        self.utilization_threshould.setToolTip(
+        self.utilization_threshold_label.setText("Minimum utilization:")
+        self.utilization_threshold.setSuffix("%")
+        self.utilization_threshold.setToolTip(
             "At paralleled level: utilized units / total units")
         self.parallel_cost_label.setText("Intercommunication cost:")
         self.parallel_cost.setText("0.0")

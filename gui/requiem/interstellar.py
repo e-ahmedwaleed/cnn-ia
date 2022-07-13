@@ -17,7 +17,7 @@ class Interstellar(object):
         self.memory_arch_table = i_gui.memory_arch_table
         # noinspection SpellCheckingInspection
         self.precision = i_gui.precision
-        self.utilization_threshould = i_gui.utilization_threshould
+        self.utilization_threshold = i_gui.utilization_threshold
         self.parallel_cost = i_gui.parallel_cost
         self.replication = i_gui.replication
         self.mac_capacity = i_gui.mac_capacity
@@ -63,7 +63,7 @@ class Interstellar(object):
 
         as_string += table_first_row
         as_string += str(self.precision.text()[:-7]) + ', '
-        as_string += str(int(self.utilization_threshould.text()[:-1]) / 100) + ', '
+        as_string += str(int(self.utilization_threshold.text()[:-1]) / 100) + ', '
         as_string += self.parallel_cost.text() + ', '
         as_string += ('true' if self.replication.isChecked() else 'false') + ', '
         as_string += ('1' if self.mac_capacity.isChecked() else '0')
