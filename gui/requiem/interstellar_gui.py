@@ -43,14 +43,22 @@ class InterstellarGUI(object):
         self.model_layer_group.setGeometry(QtCore.QRect(340, 10, 451, 51))
 
         self.layer_type = QtWidgets.QComboBox(self.model_layer_group)
-        self.layer_type.setGeometry(QtCore.QRect(70, 20, 121, 22))
+        self.layer_type.setGeometry(QtCore.QRect(70, 20, 81, 22))
         self.layer_type_label = QtWidgets.QLabel(self.model_layer_group)
         self.layer_type_label.setGeometry(QtCore.QRect(10, 20, 55, 21))
 
         self.layer_name = QtWidgets.QComboBox(self.model_layer_group)
-        self.layer_name.setGeometry(QtCore.QRect(294, 20, 147, 22))
+        self.layer_name.setGeometry(QtCore.QRect(224, 20, 107, 22))
         self.layer_name_label = QtWidgets.QLabel(self.model_layer_group)
-        self.layer_name_label.setGeometry(QtCore.QRect(230, 20, 59, 21))
+        self.layer_name_label.setGeometry(QtCore.QRect(160, 20, 59, 21))
+
+        self.batch_size = QtWidgets.QSpinBox(self.model_layer_group)
+        self.batch_size.setGeometry(QtCore.QRect(375, 20, 66, 21))
+        self.batch_size.setMaximum(1)
+        self.batch_size.setMaximum(2 ** 20)
+        self.batch_size.setAccelerated(True)
+        self.batch_size_label = QtWidgets.QLabel(self.model_layer_group)
+        self.batch_size_label.setGeometry(QtCore.QRect(340, 20, 30, 21))
 
         self.memory_arch_group = QtWidgets.QGroupBox(self.centralwidget)
         self.memory_arch_group.setGeometry(QtCore.QRect(340, 70, 611, 261))
@@ -92,30 +100,36 @@ class InterstellarGUI(object):
         self.remove_memory_level.setGeometry(QtCore.QRect(32, 22, 21, 21))
         self.remove_memory_level.clicked.connect(self.remove_memory_arch_table_row)
 
+        self.precision = QtWidgets.QSpinBox(self.memory_arch_group)
+        self.precision.setGeometry(QtCore.QRect(10, 230, 71, 21))
+        self.precision.setMaximum(2 ** 10)
+        self.precision.setProperty("value", 16)
+        self.precision.setAccelerated(True)
+
         self.utilization_threshould = QtWidgets.QSpinBox(self.memory_arch_group)
-        self.utilization_threshould.setGeometry(QtCore.QRect(105, 230, 51, 21))
+        self.utilization_threshould.setGeometry(QtCore.QRect(195, 230, 46, 21))
         self.utilization_threshould.setMaximum(100)
         self.utilization_threshould.setAccelerated(True)
         self.utilization_threshould_label = QtWidgets.QLabel(self.memory_arch_group)
-        self.utilization_threshould_label.setGeometry(QtCore.QRect(10, 230, 91, 21))
+        self.utilization_threshould_label.setGeometry(QtCore.QRect(100, 230, 91, 21))
 
         self.parallel_cost = QtWidgets.QLineEdit(self.memory_arch_group)
-        self.parallel_cost.setGeometry(QtCore.QRect(314, 230, 51, 21))
+        self.parallel_cost.setGeometry(QtCore.QRect(385, 230, 46, 21))
         self.parallel_cost.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+(\\.[0-9]+)?")))
         self.parallel_cost_label = QtWidgets.QLabel(self.memory_arch_group)
-        self.parallel_cost_label.setGeometry(QtCore.QRect(190, 230, 121, 21))
+        self.parallel_cost_label.setGeometry(QtCore.QRect(260, 230, 121, 21))
 
         self.replication = QtWidgets.QCheckBox(self.memory_arch_group)
-        self.replication.setGeometry(QtCore.QRect(440, 230, 71, 21))
+        self.replication.setGeometry(QtCore.QRect(450, 230, 71, 21))
 
         self.mac_capacity = QtWidgets.QCheckBox(self.memory_arch_group)
-        self.mac_capacity.setGeometry(QtCore.QRect(520, 230, 81, 21))
+        self.mac_capacity.setGeometry(QtCore.QRect(525, 230, 76, 21))
 
         self.output_queue_group = QtWidgets.QGroupBox(self.centralwidget)
         self.output_queue_group.setGeometry(QtCore.QRect(340, 340, 611, 291))
 
         self.output_queue_table = QtWidgets.QTableWidget(self.output_queue_group)
-        self.output_queue_table.setGeometry(QtCore.QRect(10, 50, 591, 231))
+        self.output_queue_table.setGeometry(QtCore.QRect(10, 20, 591, 261))
         self.output_queue_table.setColumnCount(3)
         self.output_queue_table.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
@@ -132,17 +146,8 @@ class InterstellarGUI(object):
         self.output_queue_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.output_queue_table.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
 
-        self.thread_limit_label = QtWidgets.QLabel(self.output_queue_group)
-        self.thread_limit_label.setGeometry(QtCore.QRect(10, 20, 121, 21))
-
-        self.thread_limit = QtWidgets.QSpinBox(self.output_queue_group)
-        self.thread_limit.setGeometry(QtCore.QRect(130, 20, 91, 21))
-        self.thread_limit.setMinimum(1)
-        self.thread_limit.setMaximum(100)
-        self.thread_limit.setAccelerated(True)
-
         self.clear_output_queue = QtWidgets.QPushButton(self.output_queue_group)
-        self.clear_output_queue.setGeometry(QtCore.QRect(540, 20, 61, 21))
+        self.clear_output_queue.setGeometry(QtCore.QRect(538, 22, 61, 21))
         self.clear_output_queue.clicked.connect(self.output_queue_table.clearContents)
 
         self.add_to_output_queue = QtWidgets.QPushButton(self.centralwidget)
@@ -171,6 +176,9 @@ class InterstellarGUI(object):
         self.layer_type.setToolTip("Supported layer type")
         self.layer_name_label.setText("Layer name:")
         self.layer_name.setToolTip("Extracted layer file")
+        self.batch_size_label.setText("Batch:")
+        self.batch_size.setProperty("value", 1)
+        self.batch_size.setToolTip("Number of inputs in a batch")
 
         self.memory_arch_group.setTitle("Memory Architecture")
         item = self.memory_arch_table.horizontalHeaderItem(0)
@@ -193,6 +201,8 @@ class InterstellarGUI(object):
         item.setToolTip("Hardware parallel template (hierarchical & neighbour & broadcast)")
         for i in range(3):
             self.add_memory_arch_table_row()
+        self.precision.setSuffix(" bit(s)")
+        self.precision.setToolTip("Number of bits (precision)")
         self.utilization_threshould_label.setText("Minimum utilization:")
         self.utilization_threshould.setSuffix("%")
         self.utilization_threshould.setToolTip(
@@ -214,9 +224,6 @@ class InterstellarGUI(object):
         self.remove_memory_level.setToolTip("Remove memory level")
 
         self.output_queue_group.setTitle("Output Queue")
-        self.thread_limit_label.setText("Maximum thread count:")
-        self.thread_limit.setSuffix(" Thread(s)")
-        self.thread_limit.setToolTip("Limit number of threads to be executed concurrently")
         self.clear_output_queue.setText("Clear")
         self.clear_output_queue.setToolTip("Clear output queue")
         item = self.output_queue_table.horizontalHeaderItem(0)
@@ -225,11 +232,10 @@ class InterstellarGUI(object):
         item.setText("Status")
         item = self.output_queue_table.horizontalHeaderItem(2)
         item.setText("Output")
+
         # TODO: Replace with actual code for add to queue button later
-        self.output_queue_table.setRowCount(1)
-        item = QtWidgets.QTableWidgetItem()
-        item.setText("0")
-        self.output_queue_table.setVerticalHeaderItem(0, item)
+        # TODO: Move Clear button when count is > 7
+        self.output_queue_table.setRowCount(8)
 
         self.add_to_output_queue.setToolTip("Add current layer to the queue")
         self.run_output_queue.setText("Run Optimizer")
