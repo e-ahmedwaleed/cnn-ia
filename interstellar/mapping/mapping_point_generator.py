@@ -11,12 +11,12 @@ import copy
 from operator import mul
 import pickle
 
-from mapping.mapping_point import MappingPoint
-from mapping.cache import Cache
+from . import utils
+from . import cost_model
+from . import loop_enum as le
 
-from mapping import utils
-from mapping import cost_model
-import mapping.loop_enum as le
+from .cache import Cache
+from .mapping_point import MappingPoint
 
 from functools import reduce
 

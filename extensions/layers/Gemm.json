@@ -1,11 +1,13 @@
 {
-  "fmap_width": "width of output fmap",
-  "fmap_height": "height of output fmap",
-  "input_fmap_channel": "input channel number",
-  "output_fmap_channel": "output channel number",
-  "window_width": "width of the filter window",
-  "window_height": "height of the filter window",
-  "batch_size": "number of image in a batch",
-  "stride_width": "width of stride, default 1",
-  "stride_height": "height of stride, default 1"
+  "#SOURCE_1": "https://cs231n.github.io/convolutional-networks/#convert",
+  "fmap_width": 1,
+  "fmap_height": 1,
+  "input_fmap_channel": "Inputs[0][1]",
+  "output_fmap_channel": "Output[0][1]",
+  "#ASSUMPTION_1": "Gemm layers after Conv2D always will have F=1",
+  "window_width": 1,
+  "window_height": 1,
+  "batch_size": "Inputs[0][0]",
+  "stride_width": 1,
+  "stride_height": 1
 }

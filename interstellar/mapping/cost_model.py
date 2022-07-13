@@ -7,7 +7,7 @@ from operator import add
 import copy
 import math
 
-import mapping.loop_enum as le
+from . import loop_enum as le
 from functools import reduce
 
 

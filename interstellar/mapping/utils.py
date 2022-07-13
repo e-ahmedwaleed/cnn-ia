@@ -1,4 +1,4 @@
-import mapping.loop_enum as le
+from . import loop_enum as le
 
 
 def print_loop_nest(point):

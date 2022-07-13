@@ -292,6 +292,7 @@ class InterstellarGUI(object):
             item.setCurrentIndex(0)
 
     def attach_functionality(self, i):
+        self.add_to_output_queue.clicked.connect(i.add_layer_to_output_queue)
         self.layer_type.currentIndexChanged.connect(i.identify_supported_layers)
 
     class NumericDelegate(QtWidgets.QStyledItemDelegate):

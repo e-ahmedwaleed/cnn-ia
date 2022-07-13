@@ -2,8 +2,8 @@
 Top level function of optimization framework
 '''
 
-from mapping import cost_model
-from mapping import mapping_point_generator
+from . import cost_model
+from . import mapping_point_generator
 
 
 def opt_optimizer(resource, layer, hint=None, verbose=False):

@@ -1,9 +1,4 @@
 # WARNING: FILE NAME SHOULD BE A VALID MODULE NAME (NO SPACES OR UNACCEPTABLE CHARACTERS)
-import os
-
-from gui import utils
-from tf2onnx.version import version
-from distutils.dir_util import copy_tree
 
 # Saved models are expected to be files by default
 MODEL_IS_DIR = True
@@ -11,6 +6,13 @@ MODEL_IS_DIR = True
 
 # TensorFlow (model_path) -> converted to onnx and saved (onnx_path)
 def to_onnx(model_path):
+    # It is highly suggested to make all imports local, so it does not affect loading speed
+    import os
+
+    from gui import utils
+    from tf2onnx.version import version
+    from distutils.dir_util import copy_tree
+
     # Dummy print to make sure the required library is available
     print("Conversion to onnx will be done using tf2onnx==" + str(version))
 

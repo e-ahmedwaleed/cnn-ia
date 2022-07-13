@@ -125,7 +125,7 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
     return exploration_tb
 
 
-def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False, reports=False):
+def dataflow_explore_optimizer(arch_info, network_info, verbose=False, reports=None):
     assert any(n > 1 for n in arch_info["parallel_count"]), \
         "parallel count has to be more than 1 for dataflow exploration"
 
@@ -134,7 +134,7 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     # NN layer specification
     layer = cm.Layer.layer(network_info)
     # Generate unrolled loops mapping configurations table
-    dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer, file_name)
+    dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer)
 
     if verbose:
         df_utils.print_tabulated_dataflow_results(dataflow_tb)

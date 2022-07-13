@@ -1,7 +1,6 @@
 '''
 Hardware resource types.
 '''
-# import numpy as np
 from collections import namedtuple
 from operator import mul
 import math
