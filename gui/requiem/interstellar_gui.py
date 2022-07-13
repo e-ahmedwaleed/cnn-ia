@@ -235,7 +235,7 @@ class InterstellarGUI(object):
 
         # TODO: Replace with actual code for add to queue button later
         # TODO: Move Clear button when count is > 7
-        self.output_queue_table.setRowCount(8)
+        self.output_queue_table.setRowCount(1)
 
         self.add_to_output_queue.setToolTip("Add current layer to the queue")
         self.run_output_queue.setText("Run Optimizer")

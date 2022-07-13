@@ -46,19 +46,20 @@ class Interstellar(object):
         as_string = ""
 
         table_first_row = '(' + str(self.memory_arch_table.rowCount())
-        table_first_row += 'x' + str(self.memory_arch_table.columnCount()) + '): '
-        item = self.memory_arch_table.item(0, 0)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.item(0, 1)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.item(0, 2)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.item(0, 3)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.cellWidget(0, 4)
-        table_first_row += item.currentText() + ', '
-        item = self.memory_arch_table.cellWidget(0, 5)
-        table_first_row += item.currentText() + '\n'
+        table_first_row += 'x' + str(self.memory_arch_table.columnCount()) + '):\n'
+        for i in range(self.memory_arch_table.rowCount()):
+            item = self.memory_arch_table.item(i, 0)
+            table_first_row += item.text() + ', '
+            item = self.memory_arch_table.item(i, 1)
+            table_first_row += item.text() + ', '
+            item = self.memory_arch_table.item(i, 2)
+            table_first_row += item.text() + ', '
+            item = self.memory_arch_table.item(i, 3)
+            table_first_row += item.text() + ', '
+            item = self.memory_arch_table.cellWidget(i, 4)
+            table_first_row += item.currentText() + ', '
+            item = self.memory_arch_table.cellWidget(i, 5)
+            table_first_row += item.currentText() + '\n'
 
         as_string += table_first_row
         as_string += str(self.precision.text()[:-7]) + ', '
