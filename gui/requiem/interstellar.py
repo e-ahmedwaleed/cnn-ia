@@ -1,4 +1,5 @@
 import json
+from ast import literal_eval as literal_eval
 
 from gui import utils
 from gui.requiem.interstellar_gui import InterstellarGUI
@@ -13,20 +14,16 @@ class Interstellar(object):
         self.output_dir = i_gui.output_dir
         self.layer_type = i_gui.layer_type
         self.layer_name = i_gui.layer_name
+        self.batch_size = i_gui.batch_size
 
         self.memory_arch_table = i_gui.memory_arch_table
-        # noinspection SpellCheckingInspection
         self.precision = i_gui.precision
-        self.utilization_threshould = i_gui.utilization_threshould
+        self.utilization_threshold = i_gui.utilization_threshold
         self.parallel_cost = i_gui.parallel_cost
         self.replication = i_gui.replication
         self.mac_capacity = i_gui.mac_capacity
 
-        # MARO ZONE
-        # ADD THIS UNDER self.add_layer_to_output_queue() IF YOU WANT TO ACTIVATE
-        # THIS FUNCTION USING ADD TO QUEUE BUTTON (TO TEST HOW TO HANDLE RUNTIME)
-        self.memory_arch_to_json()
-
+        self.output_queue = {}
         self.output_queue_table = i_gui.output_queue_table
 
         self.identify_layers(i_gui)
@@ -34,44 +31,8 @@ class Interstellar(object):
         for node in utils.list_files(self.output_dir):
             if "node" in node:
                 self.extracted_layers.append(node[:-5])
+        self.extracted_layers = utils.natural_sort(self.extracted_layers)
         self.identify_supported_layers()
-
-    ''' TODO: MARO ZONE START '''
-
-    # YOU WON'T BE ABLE TO EVEN EACH THIS CODE UNLESS U RUN THE FIRST ONE
-    # AND PROVIDE THE OUTPUT ONNX FILE PATH AS ARG TO MAIN... (i.e. I'LL DO THAT)
-
-    # noinspection SpellCheckingInspection
-    def memory_arch_to_json(self):
-        as_string = ""
-
-        table_first_row = '(' + str(self.memory_arch_table.rowCount())
-        table_first_row += 'x' + str(self.memory_arch_table.columnCount()) + '): '
-        item = self.memory_arch_table.item(0, 0)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.item(0, 1)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.item(0, 2)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.item(0, 3)
-        table_first_row += item.text() + ', '
-        item = self.memory_arch_table.cellWidget(0, 4)
-        table_first_row += item.currentText() + ', '
-        item = self.memory_arch_table.cellWidget(0, 5)
-        table_first_row += item.currentText() + '\n'
-
-        as_string += table_first_row
-        as_string += str(self.precision.text()[:-7]) + ', '
-        as_string += str(int(self.utilization_threshould.text()[:-1]) / 100) + ', '
-        as_string += self.parallel_cost.text() + ', '
-        as_string += ('true' if self.replication.isChecked() else 'false') + ', '
-        as_string += ('1' if self.mac_capacity.isChecked() else '0')
-
-        # if u need to create a folder use  utils.create_folder()
-        print("Saving at: " + self.output_dir + "/queue/memory_arch.json")
-        print(as_string)
-
-    ''' TODO: MARO ZONE END '''
 
     @staticmethod
     def identify_layers(i_gui):
@@ -87,19 +48,22 @@ class Interstellar(object):
         for layer in self.extracted_layers:
             if self.layer_type.currentText() in layer:
                 self.layer_name.addItem(layer)
+        # If non disable add to queue
+        # If queue is empty disable run optimizer
 
     def add_layer_to_output_queue(self):
         layer_type_file = "extensions/layers/"
         layer_type_file += self.layer_type.currentText() + ".json"
 
         input_format = json.load(open(layer_type_file))
-        input_format = self.identify_layer_info(input_format)
+        layer_info = self.identify_layer_info(input_format)
 
-        print(input_format)
+        self.output_queue[self.layer_name.currentText() + '-' + self.batch_size.text()] = layer_info
+        print(self.output_queue)
 
     def identify_layer_info(self, input_format):
-        layer_type_file = self.output_dir + '/'
-        layer_type_file += self.layer_name.currentText() + ".node"
+        layer_file = open(self.output_dir + '/' + self.layer_name.currentText() + ".node")
+        layer_data = layer_file.readlines()
 
         comments = []
         for key in input_format:
@@ -109,4 +73,42 @@ class Interstellar(object):
         for comment in comments:
             input_format.pop(comment)
 
+        for key in input_format:
+            if isinstance(input_format[key], str):
+                input_format[key] = self.identify_key_value(input_format[key], layer_data)
+
+        layer_file.close()
+        input_format["batch_size"] = int(self.batch_size.text())
         return extract_network_info(input_format, is_json=True)
+
+    @staticmethod
+    def identify_key_value(reference, layer_data):
+        value = -1
+        if "][" in reference:
+            title = reference[:reference.find('[')]
+            i = 0
+            for line in layer_data:
+                if title in line:
+                    row = int(reference[reference.find('[') + 1:reference.find(']')]) + 1
+                    column = int(reference[reference.rfind('[') + 1:reference.rfind(']')])
+                    value = layer_data[i + row]
+                    value = literal_eval(value[value.find('('):value.find(')') + 1])[column]
+                    break
+                i += 1
+        elif '.' in reference:
+            title = reference[:reference.find('.')]
+            sub_title = reference[reference.find('.') + 1:reference.find('[')]
+            i = 0
+            for line in layer_data:
+                if title in line:
+                    i += 1
+                    while "\t\t" in layer_data[i]:
+                        if sub_title in layer_data[i]:
+                            column = int(reference[reference.rfind('[') + 1:reference.rfind(']')])
+                            value = layer_data[i]
+                            value = literal_eval(value[value.find('['):])[column]
+                        i += 1
+                    break
+                i += 1
+
+        return value
