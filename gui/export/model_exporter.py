@@ -9,8 +9,8 @@
 import netron
 from PyQt5 import QtCore, QtWidgets
 
-from gui.requiem.interstellar_gui import InterstellarGUI
 from gui.export.model_exporter_gui import ModelExporterGUI
+from gui.requiem.interstellar import Interstellar, InterstellarGUI
 
 
 class ModelExporter(object):
@@ -30,6 +30,7 @@ class ModelExporter(object):
 
         self.requiem = None
         self.requiem_gui = None
+        self.interstellar = None
 
         # TODO: DEBUG
         self.launch_requiem()
@@ -65,9 +66,12 @@ class ModelExporter(object):
                                           ' "1":"";', self.update_state)
 
     def launch_requiem(self):
+        # Export model as png
+        self.browser.page().runJavaScript('this.__view__.export(document.title + ".png");')
         # Hide Model preview window
         self.browser.parent().parent().hide()
         # Having a reference to the window and gui is mandatory for them to work properly
         self.requiem = QtWidgets.QMainWindow()
         self.requiem_gui = InterstellarGUI(self.requiem, self.browser, self.output)
-        self.browser.page().runJavaScript('this.__view__.export(document.title + ".png");')
+        self.interstellar = Interstellar(self.requiem_gui)
+        self.requiem_gui.attach_functionality(self.interstellar)
