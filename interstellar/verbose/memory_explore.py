@@ -1,6 +1,5 @@
 import numpy as np
-
-from verbose.loop_blocking import generate_cost_row_format
+from .loop_blocking import generate_cost_row_format
 
 
 def identify_exploration_table_row(exploration_tb, index):

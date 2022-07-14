@@ -9,10 +9,10 @@ from PyQt5.QtWidgets import QFileDialog
 main_dir_path = os.path.dirname(os.path.abspath("main.py")).replace("\\", "/")
 
 
-def natural_sort(unsorted_list):
+def natural_sort(_unsorted):
     convert = lambda text: int(text) if text.isdigit() else text.lower()
     alphanum_key = lambda key: [convert(c) for c in re.split(r'(\d+)', key)]
-    return sorted(unsorted_list, key=alphanum_key)
+    return sorted(_unsorted, key=alphanum_key)
 
 
 def sleep(_seconds):

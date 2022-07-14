@@ -325,8 +325,9 @@ class InterstellarGUI(object):
             row_index += 1
 
     def attach_functionality(self, i):
-        self.add_to_output_queue.clicked.connect(i.add_layer_to_output_queue)
         self.layer_type.currentIndexChanged.connect(i.identify_supported_layers)
+        self.run_output_queue.clicked.connect(i.run_interstellar)
+        self.add_to_output_queue.clicked.connect(i.add_layer_to_output_queue)
         self.clear_output_queue.clicked.connect(i.clear_output_queue)
 
     class NumericDelegate(QtWidgets.QStyledItemDelegate):

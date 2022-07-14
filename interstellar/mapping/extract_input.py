@@ -1,14 +1,14 @@
-import json
 import os
+import json
 from . import loop_enum as le
 
 
-def extract_arch_info(arch_file, is_json=False):
+def extract_arch_info(arch_file, is_json=True):
     if is_json:
-        data = arch_file
-    else:
         with open(arch_file) as json_data_file:
             data = json.load(json_data_file)
+    else:
+        data = arch_file
 
     assert data["mem_levels"] == len(data["capacity"]), \
         "capacity list is invalid, too many or too few elements"
@@ -55,12 +55,12 @@ def extract_arch_info(arch_file, is_json=False):
     return data
 
 
-def extract_network_info(network_file, is_json=False):
+def extract_network_info(network_file, is_json=True):
     if is_json:
-        data = network_file
-    else:
         with open(network_file) as json_data_file:
             data = json.load(json_data_file)
+    else:
+        data = network_file
 
     if "batch_size" not in data:
         data["batch_size"] = 1
@@ -69,7 +69,7 @@ def extract_network_info(network_file, is_json=False):
     if "stride_height" not in data:
         data["stride_height"] = 1
 
-    if not is_json:
+    if is_json:
         layer_summary = list(data.values())
         data['layer_info'] = layer_summary
         data['layer_name'] = os.path.splitext(os.path.basename(network_file))[0]

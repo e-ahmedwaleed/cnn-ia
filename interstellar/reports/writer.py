@@ -1,8 +1,7 @@
-import reports.constants as c
-
 from fpdf import FPDF
 from datetime import date
-from verbose.utils import identify_loops_in_list_of_lists
+from . import constants as c
+from ..verbose.utils import identify_loops_in_list_of_lists
 
 
 class PDF(FPDF):

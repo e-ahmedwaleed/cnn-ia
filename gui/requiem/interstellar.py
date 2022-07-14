@@ -1,10 +1,14 @@
 import json
+import traceback
 from ast import literal_eval as literal_eval
 
 from gui import utils
-from gui.requiem.interstellar_gui import InterstellarGUI
+from gui.requiem.interstellar_gui import QtWidgets, InterstellarGUI
+
 # noinspection PyUnresolvedReferences
-from interstellar.mapping.extract_input import extract_network_info
+from interstellar.run_optimizer import dataflow_explore_optimizer
+# noinspection PyUnresolvedReferences
+from interstellar.mapping.extract_input import extract_network_info, extract_arch_info
 
 
 class Interstellar(object):
@@ -57,13 +61,17 @@ class Interstellar(object):
             self.add_to_output_queue.setEnabled(False)
 
     def add_layer_to_output_queue(self):
-        layer_type_file = "extensions/layers/"
-        layer_type_file += self.layer_type.currentText() + ".json"
 
-        input_format = json.load(open(layer_type_file))
-        layer_info = self.identify_layer_info(input_format)
+        try:
+            layer_type_file = "extensions/layers/"
+            layer_type_file += self.layer_type.currentText() + ".json"
+            input_format = json.load(open(layer_type_file))
+            layer_info = self.identify_layer_info(input_format)
+        except Exception as e:
+            self.error_message("Layer identification failure", e)
+            return
 
-        self.output_queue[self.layer_name.currentText() + '-' + self.batch_size.text()] = layer_info, None
+        self.output_queue[self.layer_name.currentText() + '-' + self.batch_size.text()] = [layer_info, None]
         self.update_output_queue_table(self.output_queue)
         self.run_output_queue.setEnabled(True)
 
@@ -72,6 +80,38 @@ class Interstellar(object):
         self.output_queue.clear()
         self.run_output_queue.setEnabled(False)
         self.update_output_queue_table(self.output_queue)
+
+    def run_interstellar(self):
+
+        try:
+            memory_arch = self.dummy_mem_arch()
+        except Exception as e:
+            self.error_message("Architecture identification failure", e)
+            return
+
+        print(memory_arch)
+        print(self.output_queue["28_Conv-1"][0])
+
+        dataflow_explore_optimizer(memory_arch, self.output_queue["28_Conv-1"][0], True)
+        self.output_queue["28_Conv-1"][1] = "أيوة بقا"
+        self.update_output_queue_table(self.output_queue)
+
+    @staticmethod
+    def dummy_mem_arch():
+        mem_arch = {
+            "mem_levels": 3,
+            "capacity": [8, 32768, 1073741824],
+            "access_cost": [0.015, 9, 200],
+            "static_cost": [0, 0, 0],
+            "parallel_count": [256, 1, 1],
+            "mac_capacity": 0,
+            "parallel_mode": [1, 0, 0],
+            "parallel_cost": [0.035],
+            "precision": 16
+        }
+
+        # TODO: consider that is_json flag is flipped for maro
+        return extract_arch_info(mem_arch, is_json=False)
 
     def identify_layer_info(self, input_format):
         layer_file = open(self.output_dir + '/' + self.layer_name.currentText() + ".node")
@@ -91,7 +131,7 @@ class Interstellar(object):
 
         layer_file.close()
         input_format["batch_size"] = int(self.batch_size.text())
-        return extract_network_info(input_format, is_json=True)
+        return extract_network_info(input_format, is_json=False)
 
     @staticmethod
     def identify_key_value(reference, layer_data):
@@ -124,3 +164,13 @@ class Interstellar(object):
                 i += 1
 
         return value
+
+    def error_message(self, title, e):
+        text = str(e)
+        details = str(traceback.format_exc())
+        msg = QtWidgets.QMessageBox(self.run_output_queue.parent())
+        msg.setText(text)
+        msg.setWindowTitle(title)
+        msg.setDetailedText(details)
+        msg.setIcon(QtWidgets.QMessageBox.Critical)
+        msg.exec_()

@@ -1,16 +1,17 @@
 import time
 import argparse
 import numpy as np
-import mapping as cm
 
-import verbose.utils as utils
-import verbose.loop_blocking as lb_utils
-import verbose.memory_explore as me_utils
-import verbose.dataflow_explore as df_utils
+from . import mapping as cm
 
-import reports.basic_report as basic_report
-import reports.memory_report as memory_report
-import reports.dataflow_report as dataflow_report
+from .verbose import utils as utils
+from .verbose import loop_blocking as lb_utils
+from .verbose import memory_explore as me_utils
+from .verbose import dataflow_explore as df_utils
+
+from .reports import basic_report as basic_report
+from .reports import memory_report as memory_report
+from .reports import dataflow_report as dataflow_report
 
 utils.enum_table = cm.loop_enum.table
 
@@ -166,7 +167,7 @@ if __name__ == "__main__":
     elif args.type == "mem_explore":
         mem_explore_optimizer(i_arch_info, i_network_info, i_schedule_info, args.verbose, args.report)
     elif args.type == "dataflow_explore":
-        dataflow_explore_optimizer(i_arch_info, i_network_info, args.name, args.verbose, args.report)
+        dataflow_explore_optimizer(i_arch_info, i_network_info, args.verbose, args.report)
     end = time.time()
 
     if args.verbose:
