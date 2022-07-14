@@ -1,4 +1,5 @@
 import json
+import threading
 import traceback
 from ast import literal_eval as literal_eval
 
@@ -27,10 +28,14 @@ class Interstellar(object):
         self.replication = i_gui.replication
         self.mac_capacity = i_gui.mac_capacity
 
-        self.output_queue = {}
-        self.update_output_queue_table = i_gui.update_output_queue_table
         self.add_to_output_queue = i_gui.add_to_output_queue
         self.run_output_queue = i_gui.run_output_queue
+
+        self.output_queue = {}
+        self.queue_thread = None
+
+        self.toggle_edit = i_gui.toggle_edit
+        self.update_output_queue_table = i_gui.update_output_queue_table
 
         self.identify_layers(i_gui)
         self.extracted_layers = []
@@ -81,19 +86,44 @@ class Interstellar(object):
         self.run_output_queue.setEnabled(False)
         self.update_output_queue_table(self.output_queue)
 
-    def run_interstellar(self):
+    def run(self):
+        self.toggle_edit(False)
+        self.queue_thread = threading.Thread(target=self.run_queue, daemon=True)
+        self.queue_thread.start()
+
+    def run_queue(self):
 
         try:
-            memory_arch = self.dummy_mem_arch()
+            self.dummy_mem_arch()
         except Exception as e:
             self.error_message("Architecture identification failure", e)
             return
 
-        print(memory_arch)
-        print(self.output_queue["28_Conv-1"][0])
+        utils.create_folder(self.output_dir + "/analysis/")
 
-        dataflow_explore_optimizer(memory_arch, self.output_queue["28_Conv-1"][0], True)
-        self.output_queue["28_Conv-1"][1] = "أيوة بقا"
+        threads = []
+        for layer in self.output_queue:
+            t = threading.Thread(target=self.run_interstellar, args=(layer,), daemon=True)
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
+
+        self.toggle_edit(True)
+
+    def run_interstellar(self, layer):
+        self.output_queue[layer][0]['layer_name'] = layer
+        report_path = self.output_dir + "/analysis/" + layer + ".pdf"
+        self.output_queue[layer][1] = 1
+        self.update_output_queue_table(self.output_queue)
+        try:
+            memory_arch = self.dummy_mem_arch()
+            dataflow_explore_optimizer(memory_arch, self.output_queue[layer][0], False, report_path)
+            self.output_queue[layer][1] = report_path
+        except KeyError:
+            self.error_message("Dataflow exploration failure",
+                               "Dataflow exploration table is empty, please try other configuration")
+            self.output_queue[layer][1] = "Dataflow exploration table is empty, please try other configuration"
         self.update_output_queue_table(self.output_queue)
 
     @staticmethod

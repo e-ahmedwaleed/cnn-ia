@@ -312,7 +312,10 @@ class InterstellarGUI(object):
             item = QtWidgets.QTableWidgetItem()
             if output:
                 if isinstance(output, str):
-                    item.setText("Finished")
+                    if ':' in output:
+                        item.setText("Finished")
+                    else:
+                        item.setText("Failure")
                 else:
                     item.setText("Running")
             else:
@@ -324,9 +327,20 @@ class InterstellarGUI(object):
             self.output_queue_table.setItem(row_index, 2, item)
             row_index += 1
 
+        QtCore.QCoreApplication.processEvents()
+
+    def toggle_edit(self, edit):
+        if edit:
+            self.clear_output_queue.setText("Clear")
+        else:
+            self.clear_output_queue.setText("Stop")
+        self.add_to_output_queue.setEnabled(edit)
+        self.model_layer_group.setEnabled(edit)
+        self.memory_arch_group.setEnabled(edit)
+
     def attach_functionality(self, i):
         self.layer_type.currentIndexChanged.connect(i.identify_supported_layers)
-        self.run_output_queue.clicked.connect(i.run_interstellar)
+        self.run_output_queue.clicked.connect(i.run)
         self.add_to_output_queue.clicked.connect(i.add_layer_to_output_queue)
         self.clear_output_queue.clicked.connect(i.clear_output_queue)
 

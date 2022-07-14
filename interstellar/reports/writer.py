@@ -153,7 +153,7 @@ def convert_dash_names_to_capital_names(names):
 
 
 def int_or_float(pdf, row_title, write):
-    int_presented = ["Capacity", "Parallel count", "Parallel mode"]
+    int_presented = ["Capacity", "Parallel count", "Parallel mode", "FX", "FY", "OX", "OY", "OC", "IC", "ON"]
     if row_title in int_presented:
         pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, str(int(write)), align='C')
     else:

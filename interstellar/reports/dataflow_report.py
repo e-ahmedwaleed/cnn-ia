@@ -9,7 +9,7 @@ def print_tables(pdf, key, loop):
     s = identify_loops_in_brackets_str(key)
     size = len(s)
     pdf.cell(4 * size, 10, s, 1, 0, 'C')
-    cost_utilization = "[cost: " + str(loop[0]) + "pJ, utilization: " + str(loop[1]) + "%]"
+    cost_utilization = "[cost: " + str(loop[0]) + " pJ, utilization: " + str(loop[1] * 100) + "%]"
     pdf.set_font('Arial', '', c.H4)
     pdf.cell(size, 10, border=0, ln=0)
     pdf.cell(70, 10, cost_utilization, 0, 0, 'L')
