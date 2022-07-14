@@ -24,7 +24,9 @@ class Interstellar(object):
         self.mac_capacity = i_gui.mac_capacity
 
         self.output_queue = {}
-        self.output_queue_table = i_gui.output_queue_table
+        self.update_output_queue_table = i_gui.update_output_queue_table
+        self.add_to_output_queue = i_gui.add_to_output_queue
+        self.run_output_queue = i_gui.run_output_queue
 
         self.identify_layers(i_gui)
         self.extracted_layers = []
@@ -46,10 +48,13 @@ class Interstellar(object):
     def identify_supported_layers(self):
         self.layer_name.clear()
         for layer in self.extracted_layers:
-            if self.layer_type.currentText() in layer:
+            if self.layer_type.currentText() == layer[layer.find('_') + 1:]:
                 self.layer_name.addItem(layer)
-        # If non disable add to queue
-        # If queue is empty disable run optimizer
+
+        if self.layer_name.count():
+            self.add_to_output_queue.setEnabled(True)
+        else:
+            self.add_to_output_queue.setEnabled(False)
 
     def add_layer_to_output_queue(self):
         layer_type_file = "extensions/layers/"
@@ -58,8 +63,15 @@ class Interstellar(object):
         input_format = json.load(open(layer_type_file))
         layer_info = self.identify_layer_info(input_format)
 
-        self.output_queue[self.layer_name.currentText() + '-' + self.batch_size.text()] = layer_info
-        print(self.output_queue)
+        self.output_queue[self.layer_name.currentText() + '-' + self.batch_size.text()] = layer_info, None
+        self.update_output_queue_table(self.output_queue)
+        self.run_output_queue.setEnabled(True)
+
+    def clear_output_queue(self):
+        # TODO: kill all active threads
+        self.output_queue.clear()
+        self.run_output_queue.setEnabled(False)
+        self.update_output_queue_table(self.output_queue)
 
     def identify_layer_info(self, input_format):
         layer_file = open(self.output_dir + '/' + self.layer_name.currentText() + ".node")

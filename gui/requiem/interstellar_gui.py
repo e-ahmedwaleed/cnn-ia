@@ -131,7 +131,7 @@ class InterstellarGUI(object):
         self.output_queue_table = QtWidgets.QTableWidget(self.output_queue_group)
         self.output_queue_table.setGeometry(QtCore.QRect(10, 20, 591, 261))
         self.output_queue_table.setColumnCount(3)
-        self.output_queue_table.setRowCount(0)
+        self.output_queue_table.setRowCount(1)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignVCenter)
         self.output_queue_table.setHorizontalHeaderItem(0, item)
@@ -148,17 +148,17 @@ class InterstellarGUI(object):
 
         self.clear_output_queue = QtWidgets.QPushButton(self.output_queue_group)
         self.clear_output_queue.setGeometry(QtCore.QRect(538, 22, 61, 21))
-        self.clear_output_queue.clicked.connect(self.output_queue_table.clearContents)
 
         self.add_to_output_queue = QtWidgets.QPushButton(self.centralwidget)
         self.add_to_output_queue.setGeometry(QtCore.QRect(800, 20, 31, 41))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/queue.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_to_output_queue.setIcon(icon)
+        self.add_to_output_queue.setEnabled(False)
 
         self.run_output_queue = QtWidgets.QPushButton(self.centralwidget)
         self.run_output_queue.setGeometry(QtCore.QRect(840, 20, 111, 41))
-        self.run_output_queue.setToolTip("")
+        self.run_output_queue.setEnabled(False)
 
         main_window.setCentralWidget(self.centralwidget)
 
@@ -232,12 +232,9 @@ class InterstellarGUI(object):
         item = self.output_queue_table.horizontalHeaderItem(2)
         item.setText("Output")
 
-        # TODO: Replace with actual code for add to queue button later
-        # TODO: Move Clear button when count is > 7
-        self.output_queue_table.setRowCount(8)
-
         self.add_to_output_queue.setToolTip("Add current layer to the queue")
         self.run_output_queue.setText("Run Optimizer")
+        self.run_output_queue.setToolTip("CNN scheduler (interstellar)")
 
     def add_supported_layers(self, layers):
         i = 0
@@ -296,9 +293,41 @@ class InterstellarGUI(object):
             item = self.memory_arch_table.cellWidget(0, 5)
             item.setCurrentIndex(0)
 
+    def update_output_queue_table(self, output_queue):
+        self.output_queue_table.clearContents()
+
+        row_count = max(1, len(output_queue))
+        if row_count < 8:
+            self.clear_output_queue.setGeometry(QtCore.QRect(538, 22, 61, 21))
+        else:
+            self.clear_output_queue.setGeometry(QtCore.QRect(520, 22, 61, 21))
+        self.output_queue_table.setRowCount(row_count)
+
+        row_index = 0
+        for key in output_queue:
+            output = output_queue[key][1]
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(key)
+            self.output_queue_table.setItem(row_index, 0, item)
+            item = QtWidgets.QTableWidgetItem()
+            if output:
+                if isinstance(output, str):
+                    item.setText("Finished")
+                else:
+                    item.setText("Running")
+            else:
+                item.setText("Ready")
+            self.output_queue_table.setItem(row_index, 1, item)
+            item = QtWidgets.QTableWidgetItem()
+            if isinstance(output, str):
+                item.setText(output)
+            self.output_queue_table.setItem(row_index, 2, item)
+            row_index += 1
+
     def attach_functionality(self, i):
         self.add_to_output_queue.clicked.connect(i.add_layer_to_output_queue)
         self.layer_type.currentIndexChanged.connect(i.identify_supported_layers)
+        self.clear_output_queue.clicked.connect(i.clear_output_queue)
 
     class NumericDelegate(QtWidgets.QStyledItemDelegate):
         def createEditor(self, parent, option, index):
