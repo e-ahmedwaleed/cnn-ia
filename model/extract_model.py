@@ -15,10 +15,9 @@ def extract(model_lib, model_path):
             raise Exception('Model Extraction Canceled.')
 
         # Spaces handled properly
-        # TODO: if you were to kill it, consider this
         model_path = (output_dir + '/' + model_name).replace(' ', '*')
         proc = utils.run_python_subprocess('./main.py ' + model_path)
 
-        return proc
+        return proc, model_path
     except:
-        return None
+        return None, None

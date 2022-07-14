@@ -10,7 +10,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-# TODO: include loop blocking and memory exploration
 # noinspection SpellCheckingInspection
 class InterstellarGUI(object):
 
@@ -38,7 +37,6 @@ class InterstellarGUI(object):
         self.gridLayout.addWidget(browser, 0, 0, 0, 0)
         browser.page().runJavaScript('this.__view__._updateZoom(0);')
 
-        # TODO: consider layer batch size to be selectable
         self.model_layer_group = QtWidgets.QGroupBox(self.centralwidget)
         self.model_layer_group.setGeometry(QtCore.QRect(340, 10, 451, 51))
 
@@ -330,10 +328,8 @@ class InterstellarGUI(object):
         QtCore.QCoreApplication.processEvents()
 
     def toggle_edit(self, edit):
-        if edit:
-            self.clear_output_queue.setText("Clear")
-        else:
-            self.clear_output_queue.setText("Stop")
+        self.clear_output_queue.setEnabled(edit)
+        self.run_output_queue.setEnabled(edit)
         self.add_to_output_queue.setEnabled(edit)
         self.model_layer_group.setEnabled(edit)
         self.memory_arch_group.setEnabled(edit)

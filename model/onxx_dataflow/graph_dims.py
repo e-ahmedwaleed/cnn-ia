@@ -38,7 +38,6 @@ class GraphDims:
         # The first element in dims is: input
         self.dims[''] = tuple(self.identify_tensor_dim(model.graph.input))
         from onnx.mapping import TENSOR_TYPE_TO_NP_TYPE
-        # TODO: support multi-input models and consider the consequences [identifying dims for input(s)]
         data_type = TENSOR_TYPE_TO_NP_TYPE[model.graph.input[0].type.tensor_type.elem_type]
         return np.random.rand(*self.dims['']).astype(data_type)
 
