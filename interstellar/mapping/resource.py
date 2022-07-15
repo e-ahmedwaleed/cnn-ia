@@ -1,11 +1,11 @@
 '''
 Hardware resource types.
 '''
-# import numpy as np
-from collections import namedtuple
-from operator import mul
+
 import math
+from operator import mul
 from functools import reduce
+from collections import namedtuple
 
 
 class Buffer(namedtuple('Buffer',

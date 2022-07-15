@@ -1,14 +1,14 @@
 '''
 Cost model.
 '''
+
+import copy
+import math
 import numpy as np
 from operator import mul
 from operator import add
-import copy
-import math
-
-import mapping.loop_enum as le
 from functools import reduce
+from . import loop_enum as le
 
 
 def get_comp_cost(layer):

@@ -1,0 +1,12 @@
+{
+  "#SOURCE_1": "https://cs231n.github.io/convolutional-networks/#convert",
+  "fmap_width": 1,
+  "fmap_height": 1,
+  "input_fmap_channel": "Inputs[0][1]",
+  "output_fmap_channel": "Output[0][1]",
+  "#ASSUMPTION_1": "Gemm layers after Conv2D always will have F=1",
+  "window_width": 1,
+  "window_height": 1,
+  "stride_width": 1,
+  "stride_height": 1
+}

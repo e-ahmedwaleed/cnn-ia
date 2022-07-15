@@ -1,6 +1,14 @@
 import os
 
+dirty_semaphore = ''
 main_dir_path = os.path.dirname(os.path.abspath("main.py")).replace("\\", "/")
+
+
+def natural_sort(_unsorted):
+    import re
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [convert(c) for c in re.split(r'(\d+)', key)]
+    return sorted(_unsorted, key=alphanum_key)
 
 
 def sleep(_seconds):
@@ -8,12 +16,35 @@ def sleep(_seconds):
     time.sleep(_seconds)
 
 
-def run_command(_cmd):
+def run_python(_args):
     import subprocess
-    proc = subprocess.run(_cmd.split(), capture_output=True)
+
+    cmd = "python "
+    if os.path.exists("./venv/Scripts/python.exe"):
+        cmd = "./venv/Scripts/python.exe "
+
+    cmd += _args
+
+    proc = subprocess.run(cmd.split(), capture_output=True)
     print(proc.stdout.decode('ascii'))
     print(proc.stderr.decode('ascii'))
     return proc
+
+
+def run_python_subprocess(_args):
+    import subprocess
+
+    cmd = "python "
+    if os.path.exists("./venv/Scripts/python.exe"):
+        cmd = "./venv/Scripts/python.exe "
+
+    cmd += _args
+    return subprocess.Popen(cmd.split())
+
+
+def list_files(_dir):
+    (_, _, files) = next(os.walk(_dir))
+    return files
 
 
 def create_file(_path, _content):
@@ -23,17 +54,11 @@ def create_file(_path, _content):
 
 
 def create_folder(_path):
-    import os
     try:
         os.mkdir(_path)
         return True
     except OSError:
         return False
-
-
-def open_folder(_path):
-    import subprocess
-    subprocess.Popen(r'explorer /select,"' + str(_path).replace('/', '\\') + '"')
 
 
 def delete_folder(_path):
@@ -53,3 +78,18 @@ def choose_file_dialog(_caption, _filter):
 def choose_folder_dialog(_caption):
     from PyQt5.QtWidgets import QFileDialog
     return QFileDialog.getExistingDirectory(parent=None, caption=_caption, directory=main_dir_path)
+
+
+def acquire_dirty_semaphore():
+    create_file(dirty_semaphore, ' ')
+
+
+def check_dirty_semaphore(_path):
+    return os.path.exists(_path.replace('*', ' ').replace(".onnx", ".temp"))
+
+
+def release_dirty_semaphore():
+    os.remove(dirty_semaphore)
+    import netron
+    netron.stop()
+    print("This line is not reached...")

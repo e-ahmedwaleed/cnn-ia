@@ -1,6 +1,7 @@
-import mapping.loop_enum as le
+from . import loop_enum as le
 
 
+# noinspection SpellCheckingInspection
 def print_loop_nest(point):
     loop_orders = list(zip(*point.loop_orders))
     loop_blockings = list(zip(*point.loop_blockings))

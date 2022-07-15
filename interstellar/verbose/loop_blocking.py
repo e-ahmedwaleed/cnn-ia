@@ -1,6 +1,5 @@
-import verbose.utils as utils
-
-from verbose.utils import STANDARD_WIDTH
+from . import utils as utils
+from .utils import STANDARD_WIDTH
 
 
 def generate_field_row_format(field_function):

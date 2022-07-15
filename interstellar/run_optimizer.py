@@ -1,14 +1,17 @@
 import time
 import argparse
 import numpy as np
-import mapping as cm
-import verbose.utils as utils
-import verbose.dataflow as df_utils
-import verbose.loop_blocking as lb_utils
-import verbose.memory_explore as me_utils
-import reports.basic_report as basic_report
-import reports.memory_report as memory_report
-import reports.dataflow_report as dataflow_report
+
+from . import mapping as cm
+
+from .verbose import utils as utils
+from .verbose import loop_blocking as lb_utils
+from .verbose import memory_explore as me_utils
+from .verbose import dataflow_explore as df_utils
+
+from .reports import basic_report as basic_report
+from .reports import memory_report as memory_report
+from .reports import dataflow_report as dataflow_report
 
 utils.enum_table = cm.loop_enum.table
 
@@ -123,7 +126,7 @@ def mem_explore_optimizer(arch_info, network_info, schedule_info, verbose=False,
     return exploration_tb
 
 
-def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False, reports=False):
+def dataflow_explore_optimizer(arch_info, network_info, verbose=False, report_path=None):
     assert any(n > 1 for n in arch_info["parallel_count"]), \
         "parallel count has to be more than 1 for dataflow exploration"
 
@@ -132,19 +135,18 @@ def dataflow_explore_optimizer(arch_info, network_info, file_name, verbose=False
     # NN layer specification
     layer = cm.Layer.layer(network_info)
     # Generate unrolled loops mapping configurations table
-    dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer, file_name)
+    dataflow_tb = cm.mapping_point_generator.dataflow_exploration(resource, layer)
 
     if verbose:
         df_utils.print_tabulated_dataflow_results(dataflow_tb)
         df_utils.print_tabulated_best_schedules(cm.utils.print_loop_nest, dataflow_tb)
 
-    if reports:
-        dataflow_report.generate(cm.utils.print_loop_nest, dataflow_tb, arch_info, network_info)
+    if report_path:
+        dataflow_report.generate(cm.utils.print_loop_nest, dataflow_tb, arch_info, network_info, report_path)
 
     return dataflow_tb
 
 
-# TODO: more to be done for reports when gui is ready
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("type", choices=["basic", "mem_explore", "dataflow_explore"], help="optimizer type")
@@ -163,7 +165,7 @@ if __name__ == "__main__":
     elif args.type == "mem_explore":
         mem_explore_optimizer(i_arch_info, i_network_info, i_schedule_info, args.verbose, args.report)
     elif args.type == "dataflow_explore":
-        dataflow_explore_optimizer(i_arch_info, i_network_info, args.name, args.verbose, args.report)
+        dataflow_explore_optimizer(i_arch_info, i_network_info, args.verbose, args.report)
     end = time.time()
 
     if args.verbose:

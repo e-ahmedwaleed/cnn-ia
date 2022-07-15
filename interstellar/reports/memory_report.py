@@ -1,8 +1,7 @@
 import math
-import reports.writer as w
-import reports.constants as c
-
-from reports.basic_report import intro_page
+from . import writer as w
+from . import constants as c
+from .basic_report import intro_page
 
 
 def build_table(pdf, table, pos, header):

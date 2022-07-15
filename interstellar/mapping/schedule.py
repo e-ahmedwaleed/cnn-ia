@@ -2,7 +2,7 @@
 Schedule hint
 '''
 
-import mapping.loop_enum as le
+from . import loop_enum as le
 
 
 class Schedule(object):
