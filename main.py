@@ -1,4 +1,8 @@
+import os
 import sys
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
 
 # QtWebEngineWidgets must be imported before a QCoreApplication instance is created
 if len(sys.argv) > 1:

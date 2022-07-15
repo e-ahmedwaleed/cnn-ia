@@ -20,8 +20,11 @@ def run_python_subprocess(_args):
     import subprocess
 
     cmd = "python "
+
     if os.path.exists("./venv/Scripts/python.exe"):
         cmd = "./venv/Scripts/python.exe "
+    elif main_dir_path[0] == '/':
+        cmd = "python3 "
 
     cmd += _args
     return subprocess.Popen(cmd.split())
@@ -61,6 +64,8 @@ def choose_file_dialog(_caption, _filter):
 
 
 def choose_folder_dialog(_caption):
+    if main_dir_path[0] == '/':
+        return main_dir_path
     from PyQt5.QtWidgets import QFileDialog
     return QFileDialog.getExistingDirectory(parent=None, caption=_caption, directory=main_dir_path)
 

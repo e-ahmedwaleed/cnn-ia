@@ -310,7 +310,7 @@ class InterstellarGUI(object):
             item = QtWidgets.QTableWidgetItem()
             if output:
                 if isinstance(output, str):
-                    if ':' in output:
+                    if (':' in output) or ('/' == output[0]):
                         item.setText("Finished")
                     else:
                         item.setText("Failure")

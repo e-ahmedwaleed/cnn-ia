@@ -121,7 +121,9 @@ class Interstellar(object):
             dataflow_explore_optimizer(memory_arch, self.output_queue[layer][0], False, report_path)
             self.output_queue[layer][1] = report_path
         except KeyError:
-            self.output_queue[layer][1] = "Dataflow exploration table is empty, please try other configuration"
+            self.output_queue[layer][1] = "dataflow exploration table is empty, please try other configuration"
+        except Exception as e:
+            self.output_queue[layer][1] = str(e)
         self.update_output_queue_table(self.output_queue)
 
     def memory_arch_to_dict(self):
