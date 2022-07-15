@@ -1,7 +1,6 @@
-import reports.writer as w
-import reports.constants as c
-
-from verbose.utils import undo_arch_info_capacity_scale
+from . import writer as w
+from . import constants as c
+from ..verbose.utils import undo_arch_info_capacity_scale
 
 
 def intro_page(title, body, arch_info):

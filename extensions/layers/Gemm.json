@@ -7,7 +7,6 @@
   "#ASSUMPTION_1": "Gemm layers after Conv2D always will have F=1",
   "window_width": 1,
   "window_height": 1,
-  "batch_size": "Inputs[0][0]",
   "stride_width": 1,
   "stride_height": 1
 }

@@ -5,20 +5,17 @@ Current implementation only supports the blocking factor and
 parallelism to be factors of the layer size 
 '''
 
-# from __future__ import division
-import itertools
 import copy
-from operator import mul
 import pickle
+import itertools
+from operator import mul
+from functools import reduce
 
 from . import utils
 from . import cost_model
 from . import loop_enum as le
-
 from .cache import Cache
 from .mapping_point import MappingPoint
-
-from functools import reduce
 
 
 def get_hinted_para(layer, level, hint):

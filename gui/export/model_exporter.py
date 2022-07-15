@@ -21,9 +21,8 @@ class ModelExporter(object):
         self.cookies = False
         self.browser = m_e_gui.browser
 
-        # TODO: DEBUG
-        # netron.start(self.model, browse=False)
-        # self.browser.setUrl(QtCore.QUrl("http://localhost:8080/"))
+        netron.start(self.model, browse=False)
+        self.browser.setUrl(QtCore.QUrl("http://localhost:8080/"))
 
         self.nextButton = m_e_gui.nextButton
         self.statusLabel = m_e_gui.statusLabel
@@ -31,9 +30,6 @@ class ModelExporter(object):
         self.requiem = None
         self.requiem_gui = None
         self.interstellar = None
-
-        # TODO: DEBUG
-        self.launch_requiem()
 
     def update_state(self, state):
         if state == '0':

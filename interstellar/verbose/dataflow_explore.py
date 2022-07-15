@@ -1,6 +1,5 @@
-import verbose.utils as utils
-
-from verbose.loop_blocking import tabulate_mapping_config, tabulate_loop_blocking
+from . import utils as utils
+from .loop_blocking import tabulate_mapping_config, tabulate_loop_blocking
 
 
 def find_best_schedules(dataflow_tb):
