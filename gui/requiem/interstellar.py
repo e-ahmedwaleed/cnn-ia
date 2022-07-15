@@ -3,7 +3,7 @@ import json
 from gui import utils
 from gui.requiem.interstellar_gui import InterstellarGUI
 # noinspection PyUnresolvedReferences
-from interstellar.mapping.extract_input import extract_network_info
+from interstellar.mapping.extract_input import extract_network_info, extract_arch_info
 
 
 class Interstellar(object):
@@ -25,7 +25,7 @@ class Interstellar(object):
         # MARO ZONE
         # ADD THIS UNDER self.add_layer_to_output_queue() IF YOU WANT TO ACTIVATE
         # THIS FUNCTION USING ADD TO QUEUE BUTTON (TO TEST HOW TO HANDLE RUNTIME)
-        self.memory_arch_to_json()
+        self.memory_arch_to_dict()
 
         self.output_queue_table = i_gui.output_queue_table
 
@@ -41,37 +41,26 @@ class Interstellar(object):
     # YOU WON'T BE ABLE TO EVEN EACH THIS CODE UNLESS U RUN THE FIRST ONE
     # AND PROVIDE THE OUTPUT ONNX FILE PATH AS ARG TO MAIN... (i.e. I'LL DO THAT)
 
-    # noinspection SpellCheckingInspection
-    def memory_arch_to_json(self):
-        as_string = ""
+    def memory_arch_to_dict(self):
+        arch_params = {'capacity': [], 'access_cost': [], "static_cost": [], "parallel_count": [], "array_dim": [],
+                       "parallel_mode": [], 'mem_levels': self.memory_arch_table.rowCount(),
+                       'precision': int(self.precision.text()[:-7]),
+                       'utilization_threshold': int(self.utilization_threshold.text()[:-1]) / 100,
+                       'parallel_cost': [float(self.parallel_cost.text())],
+                       'replication': 'true' if self.replication.isChecked() else 'false',
+                       'mac_capacity': '1' if self.mac_capacity.isChecked() else '0'}
 
-        table_first_row = '(' + str(self.memory_arch_table.rowCount())
-        table_first_row += 'x' + str(self.memory_arch_table.columnCount()) + '):\n'
         for i in range(self.memory_arch_table.rowCount()):
-            item = self.memory_arch_table.item(i, 0)
-            table_first_row += item.text() + ', '
-            item = self.memory_arch_table.item(i, 1)
-            table_first_row += item.text() + ', '
-            item = self.memory_arch_table.item(i, 2)
-            table_first_row += item.text() + ', '
-            item = self.memory_arch_table.item(i, 3)
-            table_first_row += item.text() + ', '
-            item = self.memory_arch_table.cellWidget(i, 4)
-            table_first_row += item.currentText() + ', '
-            item = self.memory_arch_table.cellWidget(i, 5)
-            table_first_row += item.currentText() + '\n'
+            arch_params['capacity'].append(int(self.memory_arch_table.item(i, 0).text()))
+            arch_params['access_cost'].append(float(self.memory_arch_table.item(i, 1).text()))
+            arch_params['static_cost'].append(float(self.memory_arch_table.item(i, 2).text()))
+            arch_params['parallel_count'].append(int(self.memory_arch_table.item(i, 3).text()))
+            arch_params['array_dim'].append(self.memory_arch_table.cellWidget(i, 4).currentIndex() + 1)
+            arch_params['parallel_mode'].append(self.memory_arch_table.cellWidget(i, 5).currentIndex())
 
-        as_string += table_first_row
-        as_string += str(self.precision.text()[:-7]) + ', '
-        as_string += str(int(self.utilization_threshold.text()[:-1]) / 100) + ', '
-        as_string += self.parallel_cost.text() + ', '
-        as_string += ('true' if self.replication.isChecked() else 'false') + ', '
-        as_string += ('1' if self.mac_capacity.isChecked() else '0')
-
-        # if u need to create a folder use  utils.create_folder()
-        print("Saving at: " + self.output_dir + "/queue/memory_arch.json")
-        print(as_string)
-
+        # print(arch_params)
+        # print(extract_arch_info(arch_params, True))
+        return extract_arch_info(arch_params, True)
     ''' TODO: MARO ZONE END '''
 
     @staticmethod
