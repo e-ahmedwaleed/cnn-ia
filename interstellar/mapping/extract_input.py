@@ -1,6 +1,5 @@
 import os
 import json
-from . import loop_enum as le
 
 
 def extract_arch_info(arch_file, is_json=True):
@@ -75,40 +74,3 @@ def extract_network_info(network_file, is_json=True):
         data['layer_name'] = os.path.splitext(os.path.basename(network_file))[0]
 
     return data
-
-
-def extract_schedule_info(schedule_file, num_levels):
-    with open(schedule_file) as json_data_file:
-        data = json.load(json_data_file)
-
-    schedule = {}
-    hint = data["schedule_hint"]
-    schedule_hint = {}
-    for loop in hint:
-        schedule_hint[le.loop_table[loop]] = [None, ] * num_levels
-        for level in hint[loop]:
-            level_index = int(level.lstrip('level'))
-            schedule_hint[le.loop_table[loop]][level_index] = [None, ] * 3
-            if "order" in hint[loop][level]:
-                schedule_hint[le.loop_table[loop]][level_index][0] = hint[loop][level]["order"]
-            if "blocking_size" in hint[loop][level]:
-                schedule_hint[le.loop_table[loop]][level_index][1] = hint[loop][level]["blocking_size"]
-            if "partitioning_size" in hint[loop][level]:
-                schedule_hint[le.loop_table[loop]][level_index][2] = hint[loop][level]["partitioning_size"]
-
-    schedule["schedule_hint"] = schedule_hint
-
-    if "partition_loops" not in data:
-        schedule["partition_loops"] = None
-    else:
-        schedule["partition_loops"] = data["partition_loops"]
-
-    # TODO partition at dimension
-    return schedule
-
-
-def extract_info(args):
-    arch_info = extract_arch_info(args.arch)
-    network_info = extract_network_info(args.network)
-    schedule_info = extract_schedule_info(args.schedule, arch_info["mem_levels"]) if args.schedule else None
-    return arch_info, network_info, schedule_info

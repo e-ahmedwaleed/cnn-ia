@@ -1,8 +1,8 @@
-fpdf==1.7.2
-netron==5.9.2
-numpy==1.23.1
-onnx==1.12.0
-onnxruntime==1.11.1
-PyQt5==5.15.7
-PyQtWebEngine==5.15.6
-tf2onnx==1.11.1
+fpdf>=1.7.2
+netron>=5.9.2
+numpy>=1.23.1
+onnx>=1.12.0
+onnxruntime>=1.11.1
+PyQt5>=5.15.7
+PyQtWebEngine>=5.15.6
+tf2onnx>=1.11.1

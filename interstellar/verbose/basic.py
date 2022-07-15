@@ -51,47 +51,6 @@ def tabulate_mapping_config(mapping_configuration):
     return table[:-1]
 
 
-def generate_cost_row_format(costs):
-    _max = max(costs)
-    table_width = len(costs)
-    column_width = max(len(str(_max)) + STANDARD_WIDTH / 2, STANDARD_WIDTH)
-
-    row_format = '\t'
-    for j in range(table_width + 1):
-        row_format += "%-" + str(int(column_width)) + "s "
-
-    return row_format + '%s'
-
-
-def tabulate_energy_costs(para_index, level_costs):
-    table_width = len(level_costs) - len(para_index)
-    row_format = generate_cost_row_format(level_costs)
-
-    table = ''
-
-    header = ["MEM:"]
-    for j in range(table_width):
-        header.append("L" + str(j))
-        if j in para_index:
-            header.append("L" + str(j) + "-PARA")
-
-    header.append("TOTAL")
-    table += (row_format % tuple(header)) + '\n'
-
-    row = 'ENERGY:'
-    # last memory level is not checked for invalid_underutilized,
-    # memory_partitions[-1] = [None]s leading to level_costs[-1] = 0
-    costs = []
-    for cost in level_costs:
-        if cost:
-            costs.append(cost)
-        else:
-            costs.append("NOT_CHECKED")
-    table += (row_format % (row, *costs, sum(level_costs)))
-
-    return table
-
-
 def schedule_details(loop):
     return "for ( " + loop[0] + ", " + str(int(loop[1])) + "b" + ", " + str(int(loop[2])) + "p )"
 

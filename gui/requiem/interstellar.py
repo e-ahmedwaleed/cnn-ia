@@ -14,9 +14,9 @@ from interstellar.mapping.extract_input import extract_network_info, extract_arc
 
 class Interstellar(object):
 
-    def __init__(self, i_gui: InterstellarGUI):
+    def __init__(self, i_gui: InterstellarGUI, output_dir):
 
-        self.output_dir = i_gui.output_dir
+        self.output_dir = output_dir
         self.layer_type = i_gui.layer_type
         self.layer_name = i_gui.layer_name
         self.batch_size = i_gui.batch_size
