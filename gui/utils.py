@@ -77,4 +77,4 @@ def release_dirty_semaphore():
     os.remove(dirty_semaphore)
     import netron
     netron.stop()
-    print("This line is not reached...")
+    print("You should not see me...")

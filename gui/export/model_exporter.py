@@ -68,6 +68,6 @@ class ModelExporter(object):
         self.browser.parent().parent().hide()
         # Having a reference to the window and gui is mandatory for them to work properly
         self.requiem = QtWidgets.QMainWindow()
-        self.requiem_gui = InterstellarGUI(self.requiem, self.browser, self.output)
-        self.interstellar = Interstellar(self.requiem_gui)
+        self.requiem_gui = InterstellarGUI(self.requiem, self.browser, self.model[self.model.rfind('/') + 1:])
+        self.interstellar = Interstellar(self.requiem_gui, self.output)
         self.requiem_gui.attach_functionality(self.interstellar)

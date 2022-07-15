@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # noinspection SpellCheckingInspection
 class InterstellarGUI(object):
 
-    def __init__(self, main_window, browser, output_dir):
+    def __init__(self, main_window, browser, model_file):
         main_window.resize(960, 640)
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         size_policy.setHorizontalStretch(0)
@@ -27,7 +27,7 @@ class InterstellarGUI(object):
         icon.addPixmap(QtGui.QPixmap(project_dir + "/imgs/stand-arrow.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         main_window.setWindowIcon(icon)
 
-        self.output_dir = output_dir
+        self.model_name = model_file.replace(".onnx", "")
         self.centralwidget = QtWidgets.QWidget(main_window)
 
         self.model_preview_group = QtWidgets.QGroupBox(self.centralwidget)
@@ -166,7 +166,7 @@ class InterstellarGUI(object):
         main_window.show()
 
     def set_text(self, main_window):
-        main_window.setWindowTitle("Inference Analyzer")
+        main_window.setWindowTitle("Inference Analyzer [" + self.model_name + ']')
         self.model_preview_group.setTitle("Model Preview")
 
         self.model_layer_group.setTitle("Model Layer")
