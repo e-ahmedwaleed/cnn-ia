@@ -1,5 +1,5 @@
 from . import utils as utils
-from .loop_blocking import tabulate_mapping_config, tabulate_loop_blocking
+from .basic import tabulate_mapping_config, tabulate_loop_blocking
 
 
 def find_best_schedules(dataflow_tb):

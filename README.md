@@ -9,5 +9,3 @@
 python -m pip install --upgrade pip
 python -m pip install PyQt5 PyQtWebEngine numpy onnx onnxruntime netron tf2onnx fpdf
 ```
-
-> :warning: **Do not touch the master branch**: just don't!

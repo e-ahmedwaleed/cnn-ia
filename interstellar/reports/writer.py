@@ -26,45 +26,6 @@ class PDF(FPDF):
         self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
 
 
-def write_cost_levels(costs, para_index, pdf):
-    num_para = 0
-    #  write first row headers
-    pdf.set_font('Arial', 'B', c.H3)  # for headers
-    pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, "MEM ", align='L')
-    pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, "ENERGY (pJ) ", align='L')
-    pdf.ln(c.INTER_SMALL_NEW_LINE)
-    pdf.set_font('Arial', '', c.H4)  # for headers
-    for cell_index in range(0, len(costs) - 1):
-        # noinspection PyUnusedLocal
-        s_checked = ""
-        not_checked = 0
-        if costs[cell_index + num_para] == 0:
-            s_checked = "NOT_CHECKED"
-            not_checked = cell_index
-        else:
-            s_checked = str(costs[cell_index + num_para])
-        if s_checked != "NOT_CHECKED":
-            pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, "L" + str(cell_index), align='L')
-            pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, s_checked, align='L')
-            pdf.ln(c.INTER_SMALL_NEW_LINE)
-        if cell_index in para_index:
-            num_para = num_para + 1
-            pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, "L" + str(cell_index) + "-PARA", align='L')
-            pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, str(costs[cell_index + num_para]), align='L')
-            pdf.ln(c.INTER_SMALL_NEW_LINE)
-    pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, "TOTAL", align='L')
-    pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, str(sum(costs)), align='L')
-    pdf.ln(c.MEDIUM_NEW_LINE)
-    # noinspection PyUnboundLocalVariable
-    if s_checked == "NOT_CHECKED":
-        pdf.set_font('Arial', 'B', c.H3)
-        # noinspection PyUnboundLocalVariable
-        pdf.cell(c.WIDTH_MARGIN, c.HEIGHT_MARGIN, "- L" + str(not_checked) +
-                 " memory was not checked for invalid under-utilization.", align='L')
-
-    pdf.ln(c.LARGE_NEW_LINE)
-
-
 def write_schedule(schedules, pdf, partitioning_loops=None):
     colored = False
     for schedule_index in reversed(range(0, len(schedules[0]))):
