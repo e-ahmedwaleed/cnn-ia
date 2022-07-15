@@ -28,6 +28,11 @@ class Interstellar(object):
         self.replication = i_gui.replication
         self.mac_capacity = i_gui.mac_capacity
 
+        # MARO ZONE
+        # ADD THIS UNDER self.add_layer_to_output_queue() IF YOU WANT TO ACTIVATE
+        # THIS FUNCTION USING ADD TO QUEUE BUTTON (TO TEST HOW TO HANDLE RUNTIME)
+        self.memory_arch_to_dict()
+        
         self.add_to_output_queue = i_gui.add_to_output_queue
         self.run_output_queue = i_gui.run_output_queue
 
@@ -44,6 +49,33 @@ class Interstellar(object):
                 self.extracted_layers.append(node[:-5])
         self.extracted_layers = utils.natural_sort(self.extracted_layers)
         self.identify_supported_layers()
+
+    ''' TODO: MARO ZONE START '''
+
+    # YOU WON'T BE ABLE TO EVEN EACH THIS CODE UNLESS U RUN THE FIRST ONE
+    # AND PROVIDE THE OUTPUT ONNX FILE PATH AS ARG TO MAIN... (i.e. I'LL DO THAT)
+
+    def memory_arch_to_dict(self):
+        arch_params = {'capacity': [], 'access_cost': [], "static_cost": [], "parallel_count": [], "array_dim": [],
+                       "parallel_mode": [], 'mem_levels': self.memory_arch_table.rowCount(),
+                       'precision': int(self.precision.text()[:-7]),
+                       'utilization_threshold': int(self.utilization_threshold.text()[:-1]) / 100,
+                       'parallel_cost': [float(self.parallel_cost.text())],
+                       'replication': 'true' if self.replication.isChecked() else 'false',
+                       'mac_capacity': '1' if self.mac_capacity.isChecked() else '0'}
+
+        for i in range(self.memory_arch_table.rowCount()):
+            arch_params['capacity'].append(int(self.memory_arch_table.item(i, 0).text()))
+            arch_params['access_cost'].append(float(self.memory_arch_table.item(i, 1).text()))
+            arch_params['static_cost'].append(float(self.memory_arch_table.item(i, 2).text()))
+            arch_params['parallel_count'].append(int(self.memory_arch_table.item(i, 3).text()))
+            arch_params['array_dim'].append(self.memory_arch_table.cellWidget(i, 4).currentIndex() + 1)
+            arch_params['parallel_mode'].append(self.memory_arch_table.cellWidget(i, 5).currentIndex())
+
+        # print(arch_params)
+        # print(extract_arch_info(arch_params, True))
+        return extract_arch_info(arch_params, True)
+    ''' TODO: MARO ZONE END '''
 
     @staticmethod
     def identify_layers(i_gui):
