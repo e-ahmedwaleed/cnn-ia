@@ -5,7 +5,7 @@ is a tool to guide designers to reach optimal hardware using an auto-optimizer
 [Interstellar-CNN-scheduler](https://github.com/xuanyoya/Interstellar-CNN-scheduler)
 to find energy-efficient accelerator designs for given DNNs.
 
-![inference-analyzer-google-net](imgs/screenshot.png)
+![inference-analyzer-google-net](imgs/screenshot-windows.png)
 
 ## Requirements
 

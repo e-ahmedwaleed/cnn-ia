@@ -54,17 +54,17 @@ class ParametersExtractor(object):
         self.modelLocation.setText(utils.main_dir_path)
 
     def extract_model_parameters(self):
-        exporter, model_path = extract_model.extract(self.selected_model, self.selected_path)
+        exporter, exported = extract_model.extract(self.selected_model, self.selected_path)
         if exporter:
             self.statusbar.parentWidget().hide()
             while True:
                 utils.sleep(10)
-                if not utils.check_dirty_semaphore(model_path):
+                if not utils.check_dirty_semaphore(exported):
                     exporter.terminate()
                     break
             QApp.quit()
         else:
-            self.set_status("Model Extraction Canceled.")
+            self.set_status(exported)
 
     def set_status(self, status):
         self.statusbar.showMessage(status)

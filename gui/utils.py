@@ -16,6 +16,24 @@ def sleep(_seconds):
     time.sleep(_seconds)
 
 
+def run_python(_args):
+    import subprocess
+
+    cmd = "python "
+
+    if os.path.exists("./venv/Scripts/python.exe"):
+        cmd = "./venv/Scripts/python.exe "
+    elif main_dir_path[0] == '/':
+        cmd = "python3 "
+
+    cmd += _args
+
+    proc = subprocess.run(cmd.split(), capture_output=True)
+    print(proc.stdout.decode('ascii'))
+    print(proc.stderr.decode('ascii'))
+    return proc
+
+
 def run_python_subprocess(_args):
     import subprocess
 
